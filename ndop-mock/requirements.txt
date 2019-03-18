@@ -1,0 +1,5 @@
+flask
+black
+flask-swagger-ui
+requests_mock
+coverage

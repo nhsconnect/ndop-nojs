@@ -1,0 +1,341 @@
+openapi: 3.0.0
+info:
+  title: NDOP Mock API
+  description: Simple mock which emulates the backend responses of ndop for local development
+  version: "0.1"
+
+components:
+  securitySchemes:
+    sessionCookie:
+      type: apiKey
+      in: cookie
+      name: session_id
+
+paths:
+  /createsession:
+    get:
+      summary: Creates a session
+      responses:
+        '200':
+          description: Session has been successfully created
+          content:
+            application/json:
+              schema:
+                type: object
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session_id=5357bfcee416d5dd9e4a3ba2d540886484e802b970458f7212c64db9239e9129; expires=Thu, 14 Feb 2019 13:38:45 GMT; HttpOnly; Secure
+  /details:
+    post:
+      summary: Sends user details to the backend
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                dateOfBirthDay:
+                  type: string
+                dateOfBirthMonth:
+                  type: string
+                dateOfBirthYear:
+                  type: string
+                nhsNumber:
+                  type: string
+                postcode:
+                  type: string
+              required:
+                - firstName
+                - lastName
+                - dateOfBirthDay
+                - dateOfBirthMonth
+                - dateOfBirthYear
+      responses:
+        '200':
+          description: User details have been received by the server
+          content:
+            application/json:
+              schema:
+                type: object
+  /patientsearchresult:
+    get:
+      summary: Polls the server for user details until they are found or errors
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: User details found, returns contact details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  search_result:
+                    type: string
+                    description: The status of the search
+                    example: "success"
+                  email:
+                    type: string
+                    description: Obfuscated email address of the user
+                  sms:
+                    type: string
+                    description: Obfuscated mobile number of the user
+        '206':
+          description: Have not yet found user's details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  search_result:
+                    type: string
+                    description: The status of the search
+                    example: 'incomplete'
+        '401':
+          description: Generic error, usually the user does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  search_result:
+                    type: string
+                    description: The status of the search
+                    example: 'ndop-info'
+        '422':
+          description: Unprocessable entity, the user did not have any contact details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  search_result:
+                    type: string
+                    description: The status of the search
+                    example: 'ndop-info'
+  /requestcode:
+    post:
+      summary: Request an OTP code be generated for a specific receiver type
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                otp_delivery_type:
+                  type: string
+              required:
+                - otp_delivery_type
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+        '406':
+          description: Number of retries exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "max_count_exceeded"
+  /resendcode:
+    get:
+      summary: Request that a code be resent
+      description: Triggers a code to be resent via the receiver type specified in request code.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Either success or failure response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  resend_count:
+                    type: string
+                    example: 'max_count_reached'
+              examples:
+                success:
+                  value:
+                    resend_count: "success"
+                failure:
+                  value:
+                    resend_count: "max_count_reached"
+
+  /verifycode:
+    post:
+      summary: Submit the OTP to confirm that it is valid
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enterOtpInput:
+                  type: string
+                  description: 6 digit pin sent to user's selected delivery option
+              required:
+                - enterOtpInput
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+        '406':
+          description: Max number of attempts exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  warning:
+                    type: string
+                    example: 'invalid_otp_entered'
+  /getpreferenceresult:
+    get:
+      summary: Gets the existing opt-in preference of the user
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Successfully found user's preferences
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  get_preference_result:
+                    type: string
+                    example: "success"
+                  opted_out:
+                    type: string
+                    example: "active"
+        '206':
+          description: Have not yet found user's preference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  search_result:
+                    type: string
+                    description: The status of the search for users' preferences
+                    example: 'incomplete'
+  /setpreferences:
+    post:
+      summary: Update the user's preference
+      security:
+        - sessionCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preference:
+                  type: string
+                  example: "optedIn"
+              required:
+                - preference
+      responses:
+        '200':
+          description: Successfully set the user's preference
+          content:
+            application/json:
+              schema:
+                type: object
+  /confirmationdeliverymethod:
+    get:
+      summary: Check which delivery method should be used to contact the user to confirm
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Retrieved delivery method preference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preference:
+                    type: string
+                    example: "optedIn"
+                  email:
+                    type: string
+                  mobile:
+                    type: string
+
+  /confirmationsender:
+    get:
+      summary: A trigger to send the confirmation message
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Message successfully triggered
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /storepreferencesresult:
+    get:
+      summary: Checks that the preferences have been stored as expected
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Retrieved current stored preference state
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preference:
+                    type: string
+                    example: "optedIn"
+                  store_result:
+                    type: string
+                    example: "success"
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session_id=''
+        '206':
+          description: Have not yet found user's preference
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  search_result:
+                    type: string
+                    description: The status of the search for users' preferences
+                    example: 'incomplete'
+
+

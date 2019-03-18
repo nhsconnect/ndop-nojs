@@ -1,0 +1,1 @@
+INVALID_SESSIONS = list(['123456qwe'])
