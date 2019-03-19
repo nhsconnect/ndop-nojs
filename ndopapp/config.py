@@ -13,7 +13,8 @@ def ensure_leading_slash(string):
 
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-ENCODED_SECRET_KEY = os.environ.get('SECRET_KEY', '2ci+prYkenQShibIB9+tCntSeH3fJ8Li')
+# Arbitrary secret key for session state that gets generated on deployment
+ENCODED_SECRET_KEY = os.environ.get('SECRET_KEY', 'A_DEFAULT_SECRET_KEY')
 
 NDOP_MOCK_HOST = os.environ.get('NDOP_MOCK_HOST', "localhost")
 NDOP_MOCK_PORT = os.environ.get('NDOP_MOCK_PORT', 5001)
