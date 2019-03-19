@@ -51,8 +51,7 @@ There are two endpoints (below) which are designed to return 206 (incomplete) a 
 
 ## Available endpoints
 
-There is a basic list of available endpoints here:
-https://confluence.digital.nhs.uk/display/NAII/NDOP+Mock+routes
+There is a basic list of available endpoints on confluence.
 
 ## Data
 

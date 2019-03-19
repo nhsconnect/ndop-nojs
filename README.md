@@ -53,7 +53,7 @@ export ENV_NAME=ndop-build10
 
 ### Running tests
 
-API commands can be viewed here https://confluence.digital.nhs.uk/display/NAII/NDOP+Mock+routes
+API commands can be viewed here on confluence
 
 #### Run unit tests
 ```
