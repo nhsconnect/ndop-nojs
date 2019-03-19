@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{% if form.errors %}Error - {% endif %}Enter your date of birth{% endblock %}
+
+{% block content %}
+{% include 'snippet/messages.html' %}
+
+<div class="grid-row">
+  <div class="column--two-thirds">
+    <form id="yourDetailsDOBForm" method="POST" action="">
+    {{ form.csrf_token }}
+      <fieldset>
+        <legend class="form-label">
+          <h1 class="h2">Enter your date of birth</h1>
+        </legend>
+        <div class="grid-row">
+          <div class="column--two-thirds">
+            <div class="-date form-group form-row util-no-margin {{'form-row-error-active has-error' if form.errors }}" id="dob">
+              <p class="error error-message error-label error-text {{'error-message-active' if form.errors }}" id="dob-error">
+                Enter your date of birth
+              </p>
+              <span class="form-label__hint">For example, '5 7 1948'</span>
+              <div id="dateOfBirthDayContainer" class="field-container" tabindex="-1">
+                {{ form.day.label(id='dateOfBirthDayLabel', for_="dateOfBirthDay") }}
+                {{ form.day(class_='day form-control', id="dateOfBirthDay", autocomplete='bday-day') }}
+              </div>
+              <div>
+                {{ form.month.label(id='dateOfBirthMonthLabel', for_="dateOfBirthMonth") }}
+                {{ form.month(class_='month form-control', id="dateOfBirthMonth",  autocomplete="bday-month") }}
+              </div>
+              <div>
+                {{ form.year.label(id='dateOfBirthYearLabel', for_="dateOfBirthYear") }}
+                {{ form.year(class_='year form-control', id="dateOfBirthYear", autocomplete="bday-year") }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+      <input type="submit" class="button" id="detailsDOBContinueButton" value="Continue">
+    </form>
+    <p><a href="{{ routes.get_absolute('yourdetails.your_details') }}" id="detailsDOBGoBackLink">Go back</a></p>
+  </div>
+</div>
+{% endblock %}

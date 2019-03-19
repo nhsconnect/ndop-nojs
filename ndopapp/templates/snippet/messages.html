@@ -1,0 +1,25 @@
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+  <div id="errorBox" class="error error-summary callout callout--error error-message error-message-active" role="alert" tabindex="-1">
+    {% if messages[0].message == "Enter your code below" %}
+      <h2 class="h3" id="error-summary">Indicate your choice to continue</h2>
+    {% else %}
+      <h2 class="h3" id="error-summary">To use this online service, resolve the following errors</h2>
+    {% endif %}
+
+
+    <ul class="flashes link-list" id="link-to-errors">
+    {% for message in messages %}
+        {% for message_type in message %}
+            {% if message[message_type][0].message %}
+                <li>
+                    <a href="#{{ message[message_type][0].href }}" id="{{ message[message_type][0].id }}">{{ message[message_type][0].message }}</a>
+                </li>
+            {% endif %}
+        {%  endfor %}
+    {% endfor %}
+    </ul>
+
+  </div>
+  {% endif %}
+{% endwith %}

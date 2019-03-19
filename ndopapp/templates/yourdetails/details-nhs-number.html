@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}{% if form.errors %}Error - {% endif %}Enter your NHS Number{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+    <div class="column--two-thirds">
+        {% include 'snippet/messages.html' %}
+
+        <form id="yourDetailsNHSNumberForm" method="POST" action="">
+            {{ form.csrf_token }}
+            <h1 class="h2">
+                <label for="nhs-number">Enter your NHS Number</label>
+            </h1>
+            <div class="grid-row">
+                <div id="nhsNumberContainer" class="column--three-quarters field-container" tabindex="-1">
+                    <div id="nhsNumber">
+                        <div class="form-group form-row {{'form-row-error form-row-error-active has-error' if form.errors }}">
+                            <label for="nhs-number-input">
+                                <span class="form-label__hint">This is a 10 digit number, like 485 777 3456</span>
+                            </label>
+                            {% if form.nhs_number.errors %}
+                                {% for e in form.nhs_number.errors %}
+                                    <p class="error error-message error-text error-label error-message-active" id="nhs-number-error" >{{ e.error_alert }}</p>
+                                {% endfor %}
+                            {% endif %}
+                            {{ form.nhs_number(class_="-small form-control", id="nhs-number-input") }}
+                        </div>
+                    </div>
+                    <input type="submit" class="button" id="detailsNHSNumberContinueButton" value="Continue">
+                </div>
+            </div>
+        </form>
+        <p>
+            <a href="{{ routes.get_absolute('yourdetails.details_auth_option') }}" id="detailsNHSNumberGoBackLink">Go back</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

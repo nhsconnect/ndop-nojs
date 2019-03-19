@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Verification failure{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2">Sorry, the details you gave us do not match what we have in our
+                records.</h1>
+            <div class="reading-width">
+                <p>This may be because your GP practice does not have the correct details for
+                    you.</p>
+                <p>
+                    You may be able to make your choice online by giving us your NHS number.
+                </p>
+                <a href="{{ routes.get_absolute('yourdetails.details_nhs_number') }}" class="button"
+                   id="goToNHSNumberRoute">Use my NHS number</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

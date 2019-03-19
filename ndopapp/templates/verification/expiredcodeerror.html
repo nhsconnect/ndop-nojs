@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Your code has expired{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2" id="ageRestrictionErrorTitle">Your code has expired</h1>
+            <p>The code you have entered has now expired. For security reasons, your code will
+                expire after 30 minutes.</p>
+            <p>You will need a new verification code.</p>
+            <p>
+                <a href="{{ routes.get_absolute('verification.resend_code') }}" class="button">
+                    Receive a new code
+                </a>
+            </p>
+            <h2 class="h3">Other ways to manage your choice</h2>
+            <p> If you are having difficulties verifying your code we may be able to guide you
+                through the service, or manage your choice on your behalf.</p>
+            <p>Call: 0300 303 5678</p>
+            <p>Open: 9am to 5pm Monday to Friday (excluding bank holidays).</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}No contact details found{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 id="contactDetailsNotFoundTitle" class="h2">No contact details found</h1>
+            <p>
+                Thanks, we&apos;ve found your details, but we could not find a mobile number or
+                email address.
+            </p>
+            <p>
+                This may be because you have not registered these details with your GP Practice, or
+                your GP Practice has not yet shared them with us.
+            </p>
+            <p>
+                You can try again when your information is updated, or you can choose to use the
+                non-digital service instead.
+            </p>
+            <p>Please see <a
+                    href="https://www.nhs.uk/your-nhs-data-matters/manage-your-choice/other-ways-to-manage-your-choice/">other
+                ways to manage your choice</a>.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

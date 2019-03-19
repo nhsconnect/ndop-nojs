@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Review your choice{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+  <div class="column--two-thirds">
+    <h1 class="h2">Review your choice</h1>
+    <h2 id="your-preference" class="h3">Your choice</h2>
+    <p>Your confidential patient information <strong id="choice">
+        {% if session.get("opted_out") == "active" %}
+            cannot
+        {% else %}
+            can
+        {% endif %}
+    </strong> be used |
+        <a id="editChoicesLink" href="{{ routes.get_absolute('yourdetails.set_your_preference') }}">
+            Change <span class="util-visuallyhidden">your preference</span>
+        </a>
+    </p>
+
+    {% if confirmation_delivery_details.method == "sms" %}
+        <p class="confirmation-type" id="email-confirm">
+            We will send confirmation of your choice to {{ confirmation_delivery_details.sms }}
+        </p>
+    {% elif confirmation_delivery_details.method == "email" %}
+        <p class="confirmation-type" id="mobile-confirm">
+            We will send confirmation of your choice to {{ confirmation_delivery_details.email }}
+        </p>
+    {% endif %}
+    <a id="reviewChoicesSubmitButton" href="{{ routes.get_absolute('yourdetails.confirmation_sender') }}" class="button">Confirm</a>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{
+  "aws": {
+    "manage_roles": false,
+    "project_name": "ndop-nojs",
+    "keep_warm": false,
+    "debug": false,
+    "log_level": "INFO",
+    "app_function": "main.app",
+    "binary_support": false,
+    "use_precompiled_packages": true,
+    "context_header_mappings": {
+      "X-AMZ-STAGE": "stage",
+      "X-AMZ-REQUEST-ID": "requestId"
+    }
+  }
+}

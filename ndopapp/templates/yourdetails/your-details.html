@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}{% if form.errors %}Error - {% endif %}Enter your name{% endblock %}
+
+{% block content %}
+{% include 'snippet/messages.html' %}
+<div class="grid-row">
+    <div class="column--two-thirds">
+        <form method="POST" id="yourDetailsNameForm" action="">
+            {{ form.csrf_token }}
+            <fieldset>
+                <legend>
+                    <h1 class="h2">Enter your name</h1>
+                </legend>
+                <div class="grid-row">
+                    <div class="column--two-thirds" >
+
+                        <div class="form-group form-row {{'form-row-error form-row-error-active has-error' if form.errors }}" id="firstNameContainer" tabindex="-1">
+                            {% if form.first_name.errors %}
+                            {% for e in form.first_name.errors %}
+                            <p class="error error-message error-text error-label error-message-active", id="first-name-error">
+                                {{ e.error_alert }}</p>
+                            {% endfor %}
+                            {% endif %}
+                            {{ form.first_name.label(class_='form-label', for_="firstName", id='firstNameLabel') }}
+                            {{ form.first_name(class_='form-control', id="firstName", autocomplete='given-name') }}
+                        </div>
+
+                        <div class="form-group form-row {{'form-row-error form-row-error-active has-error' if form.errors }}" id="lastNameContainer" tabindex="-1">
+                            {% if form.last_name.errors %}
+                            {% for e in form.last_name.errors %}
+                            <p class="error error-message error-text error-label error-message-active"
+                               id="last-name-error">{{ e.error_alert }}</p>
+                            {% endfor %}
+                            {% endif %}
+                            {{ form.last_name.label(class_="form-label", for_="lastName", id='lastNameLabel') }}
+                            {{ form.last_name(class_='form-control', id="lastName", autocomplete='family-name') }}
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <input type="submit" class="button" id="detailsNameContinueButton" value="Continue">
+        </form>
+        <p><a href="{{ routes.get_absolute('main.landing_page') }}" id="detailsDOBGoBackLink">Go back</a></p>
+    </div>
+</div>
+{% endblock %}

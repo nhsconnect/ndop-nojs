@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}{% if form.errors %}Error - {% endif %}Do you know your NHS number?{% endblock %}
+
+{% block content %}
+{% include 'snippet/messages.html' %}
+
+<div class="grid-row">
+  <div class="column--two-thirds">
+    <form method="POST" action="{{ routes.get_absolute('yourdetails.details_auth_option') }}">
+      <fieldset id="auth-option" class="form-group form-row util-no-margin {{'form-row-error-active has-error error-message-active' if form.errors }}">
+        <div class="reading-width">
+          <legend id="radioFormLegend"><h1 class="h2">Do you know your NHS number?</h1></legend>
+          <div class="error error-message {{'error-message-active' if form.errors }} ">
+            {% if form.radio.errors %}
+                {% for e in form.radio.errors %}
+                  <p class="error error-message error-text error-label error-message-active">Indicate your choice to continue</p>
+                {% endfor %}
+            {% endif %}
+          </div>
+          <span class="form-label__hint">This is a 10 digit number, like 485 777 3456</span><span
+          class="form-label__hint">You can find this on any letter sent to you by the NHS, on a prescription or by logging in to a GP practice online service</span>
+        </div>
+        <div class="radio" role="radiogroup" aria-labelledby="radioFormLegend">
+          {{ form.hidden_tag() }}
+          {% for subfield in form.radio %}
+            {% if subfield.label.text == 'Yes' %}
+                <div>
+                {{ subfield(class='form-label form-label--radio', id="nhs-number-journey", value="Yes", **{"aria-labelledby": "radioFormLegend"} ) }}
+                {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="nhs-number-journey") }}
+                </div>
+            {% endif %}
+            {% if subfield.label.text == 'No' %}
+                <div>
+                {{ subfield(class='form-label form-label--radio', id="no-nhs-number-journey", value="No", **{"aria-labelledby": "radioFormLegend"} ) }}
+                {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="no-nhs-number-journey") }}
+                </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </fieldset>
+      <input type="submit" class="button" id="detailsAuthOptionSubmitButton" value="Continue">
+    </form>
+
+    <details class="" role="group">
+      <summary role="button"><span class="details__summary">Where you can find your NHS number</span></summary>
+      <div class="details__content">
+        <div class="reading-width"><p>An NHS number is a 10 digit number, like 485 777 3456.</p>
+          <p>You can find your NHS number by logging in to a GP practice online service or on any document sent to
+            you by the NHS. This may include:</p>
+          <ul>
+            <li>prescriptions</li>
+            <li>test results</li>
+            <li>hospital referral letters</li>
+            <li>appointment letters</li>
+          </ul>
+          <p>You can also ask your GP practice for help if you can`t find your NHS number.</p></div>
+      </div>
+    </details>
+    <p><a href="{{ routes.get_absolute('yourdetails.details_dob') }}" id="detailsAuthOptionGoBackLink">Go back</a></p>
+  </div>
+</div>
+{% endblock %}

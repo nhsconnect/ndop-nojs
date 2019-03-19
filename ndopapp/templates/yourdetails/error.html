@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Something went wrong{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+    <div class="column--two-thirds">
+        <h1 class="h2">Oops! Something went wrong.</h1>
+        <p>Sorry, there seems to be a problem. It&apos;s not you, it&apos;s us!</p>
+        <p>Please try again later</p>
+        <a id="returnButton" role="button" class="button" href="{{ routes.get_absolute('main.landing_page') }}">Return to the start page</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block title %}Thank you{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+    <div class="column--two-thirds">
+        <p class="alert alert-success" role="alert" style="opacity:1;" tabindex="-1">Your choice has
+            been saved.</p>
+        <h1 class="h2">Thank you</h1>
+
+        {% if user_details.opted_out == "active" %}
+
+        <div id="not-shared">
+            <p>
+                Your confidential patient information will not be used for research and planning.
+            </p>
+            <h2 class="h3" id="what-happens-next">What happens next</h2>
+            <p>
+                It can take up to 21 days before your decision can be applied to future data
+                releases leaving the NHS. Your
+                choice will be applied gradually across all organisations that use confidential
+                patient information.
+            </p>
+            <p>
+                Your choice will be acknowledged by other organisations that use health and social
+                care information by March
+                2020.
+            </p>
+            <p>
+                You can update your choice at any time in the future using this service.
+            </p>
+        </div>
+
+        {% else %}
+
+        <div id="shared" class="">
+            <p>
+                Your confidential patient information can be used to help improve health and care
+                services for the future.
+            </p>
+            <h2 class="h3" id="what-happens-next">What happens next</h2>
+            <p>
+                If you have previously opted out of using your confidential patient information, it
+                can take up to 21 days
+                before your opt-out is withdrawn.
+            </p>
+            <p>
+                You can update your choice at any time in the future using this service.
+            </p>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

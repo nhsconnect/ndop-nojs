@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Review your details{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+    <div class="column--two-thirds">
+        <div class="reading-width">
+            <h1 class="h2">Review your details</h1>
+            <div class="">
+                <h2 class="h3" id="review-your-details">Your details</h2>
+                <dl class="review-your-answers">
+                    <dt class="question" id="your-name">Your name</dt>
+                    <dd class="answer" id="your-name-answer">{{ details.firstName}} {{
+                        details.lastName }}
+                    </dd>
+                    <dd class="change">
+                        <a id="your-name-change"
+                           href="{{ routes.get_absolute('yourdetails.your_details') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
+                            Change <span class="util-visuallyhidden">your name</span>
+                        </a>
+                    </dd>
+                    <dt class="question" id="your-dob">Your date of birth</dt>
+                    <dd class="answer" id="your-dob-answer">{{ details.dob }}</dd>
+                    <dd class="change">
+                        <a id="your-dob-change"
+                           href="{{ routes.get_absolute('yourdetails.details_dob') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
+                            Change <span class="util-visuallyhidden">your date of birth</span>
+                        </a>
+                    </dd>
+                    {% if details.postcode %}
+                        <dt class="question" id="your-postcode">Your Postcode</dt>
+                        <dd class="answer" id="your-postcode-answer">{{ details.postcode }}</dd>
+                        <dd class="change">
+                            <a id="your-postcode-change"
+                               href="{{ routes.get_absolute('yourdetails.details_postcode') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
+                                Change<span class="util-visuallyhidden">your postcode</span>
+                            </a>
+                        </dd>
+                    {% endif %}
+                    {% if details.nhsNumber %}
+                        <dt class="question" id="your-nhsnumber">Your NHS Number</dt>
+                        <dd class="answer" id="your-nhsnumber-answer">{{ details.nhsNumber }}</dd>
+                        <dd class="change">
+                            <a id="your-nhsnumber-change"
+                               href="{{ routes.get_absolute('yourdetails.details_nhs_number') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
+                                Change<span class="util-visuallyhidden">your NHS number</span>
+                            </a>
+                        </dd>
+                    {% endif %}
+                </dl>
+            </div>
+            <form id="yourDetailsReview" method="POST"
+                  action="{{ routes.get_absolute('yourdetails.your_details_review') }}">
+                {{ form.hidden_tag() }}
+                <p>
+                    This information will be used to find your contact details in our
+                    database. Once a match has been found, we will send you a one-time verification
+                    code.
+                </p>
+                <p>
+                    You agree to let us search for your details in our database, so that we can send
+                    you a one-time security passcode.
+                </p>
+                <input
+                        type="submit" class="button"
+                        id="detailsReviewContinueButton" value="Agree and submit">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

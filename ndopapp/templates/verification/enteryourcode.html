@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %} {% if form.enterOtpInput.errors %}Error - {% endif %}Enter your code  {% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div id="errorBox"
+                 class="error error-summary callout callout--error error-message error-message-active"
+                 role="alert" tabindex="-1">
+                {% if is_reenter_code %}
+                <h2 class="h3" id="error-summary">Incorrect code</h2>
+                <ul class="link-list">
+                    <li class="">
+                        <a id="enterOtpInputLink" class="error-text" href="#code-input">
+                            The code you provided was incorrect
+                        </a>
+                    </li>
+                </ul>
+                {% else %}
+                <h2 class="h3" id="error-summary">To use this online service, enter your code</h2>
+                <ul class="link-list">
+                    <li class="">
+                        <a id="enterOtpInputLink" class="error-text" href="#code-input">
+                            No code was provided
+                        </a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <h1 class="h2">Enter your code </h1>
+            <div class="reading-width">
+                {% if not form.enterOtpInput.errors %}
+                <div class="alert alert-success " id="flash-message" role="alert" tabindex="-1" style="opacity: 1;">
+                    <p>Your code has been successfully sent!</p>
+                </div>
+                {% endif %}
+                {% if is_resent %}
+                <div id="resend-notice">
+                    <p>We’ve resent your code to your chosen option. The code will expire in 30 minutes. Do not close
+                        this browser window or your code will also expire.</p>
+                </div>
+                {% endif %}
+                <form class="form" method="POST" id="enterOtpForm" action="{{ routes.get_absolute('verification.enter_your_code') }}">
+                    {{ form.hidden_tag() }}
+                    <div id="code-input" class="form-group form-row form-row-error-active">
+                        <label id="enterOtpLabel" class="form-label" for="enterOtpInput">Enter the code received on your
+                            mobile or email</label>
+                        <div class="error error-message ">
+                            <p class="error-text error-label">Enter your code below</p>
+                        </div>
+                        <div class="{{ 'form-row-error form-row-error-active' if messages }}">
+                            {% if form.enterOtpInput.errors %}
+                            {% for e in form.enterOtpInput.errors %}
+                            <p class="error error-message error-text error-label error-message-active" id="code-error">
+                                {{ e.message }}</p>
+                            {% endfor %}
+                            {% endif %}
+                            {{ form.enterOtpInput(class_="-small form-control", id="enterOtpInput") }}
+                            <p>Didn't receive your code?
+                                {% if is_resent_max_reached %}
+                                <a href="{{ routes.get_absolute('verification.resend_code_error') }}" id="resend-code">Contact us</a>
+                                {% else %}
+                                <a href="{{ routes.get_absolute('verification.resend_code') }}" id="resend-code">Resend code</a>
+                                {% endif %}
+                            </p>
+                            <input type="submit" id="enterOtpSubmitButton" class="button" role="button" value="Submit">
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

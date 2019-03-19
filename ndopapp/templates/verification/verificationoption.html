@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}{% if form.radio.errors %}Error - {% endif %}Choose how to verify yourself{% endblock %}
+{% block content %}
+<h1 class="h2">Verification option</h1>
+{% endblock %}
+
+{% block extra_page_sections %}
+<div class="page-section">
+  <div class="reading-width">
+    <div class="grid-row">
+      <div class="column--two-thirds">
+        <div>
+          <div class="alert alert-success" id="flash-message" role="alert" style="opacity: 1;">
+            <p>Success! We believe we've found a match based on the details you've provided</p>
+          </div>
+          <p>We now need to send you a verification code. Your verification code will be sent to the option you choose below.</p>
+          <p>The code will expire 30 minutes after you have chosen your option.</p>
+        </div>
+        {% if form.radio.errors %}
+        <div id="errorBox" class="error error-summary callout callout--error error-message error-message-active" role="alert" tabindex="-1">
+            <h2 class="h3">Select a verification option to continue</h2>
+            <ul class="link-list">
+              <li>
+                <a id="radioOptionsLink" href="#verification-option">
+                  No verification option selected
+                </a>
+              </li>
+            </ul>
+        </div>
+        {% endif %}
+        <form id="verificationForm" class="form" action="{{ routes.get_absolute('verification.verification_option') }}" method="POST">
+        <fieldset id="verification-option" class="form-group form-row ">
+            <legend class="h3 error-label">Where should we send your verification code?</legend>
+            <div class="error error-message {{'error-message-active' if form.errors }} ">
+              {% if form.radio.errors %}
+                  {% for e in form.radio.errors %}
+                    <p class="error error-message error-text error-label error-message-active">To use the online service, select an option to continue</p>
+                  {% endfor %}
+              {% endif %}
+            </div>
+            <div class="error error-message ">
+                <p class="error-text">To use the online service, select an option to continue</p>
+            </div>
+            <span class="form-label__hint">
+                {% if user_details.email and user_details.sms %}
+                    The full email address and phone number have been hidden for your privacy
+                {% elif user_details.email %}
+                    The full email address has been hidden for your privacy
+                {% elif user_details.sms %}
+                    The full phone number has been hidden for your privacy
+                {% endif %}
+            </span>
+            <div>
+                {{ form.hidden_tag() }}
+                {% for subfield in form.radio %}
+                     {% if 'Send an email to' in subfield.label.text %}
+                          <div>
+                          {{ subfield(class='form-label form-label--radio', id='radioEmail') }}
+                          {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="radioEmail", id='label-for-radioEmail')}}
+                         </div>
+                     {% endif %}
+                     {% if 'Send an sms to' in subfield.label.text %}
+                          <div>
+                          {{ subfield(class='form-label form-label--radio', id="radioSMS") }}
+                          {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="radioSMS", id='label-for-radioSMS')}}
+                         </div>
+                     {% endif %}
+                     {% if 'I do not recognise' in subfield.label.text %}
+                          <div>
+                          {{ subfield(class='form-label form-label--radio', id="radioUnrecognised") }}
+                          {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="radioUnrecognised", id='label-for-radioUnrecognised')}}
+                         </div>
+                     {% endif %}
+                {% endfor %}
+            </div>
+        </fieldset>
+        <input type="submit" id="verificationSubmitButton" class="button" role="button" value="Continue"></form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

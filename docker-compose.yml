@@ -1,0 +1,55 @@
+version: '3'
+services:
+
+  ndop:
+    build:
+      context: .
+      dockerfile: ci/ndopapp/Dockerfile
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_ENV=production
+      - SERVER_NAME=localhost.dev
+      - NDOP_MOCK_HOST=ndop-mock
+      - NDOP_MOCK_PORT=5000
+      - CLIENT_FACING_URL=http://localhost
+      - API_URL=http://ndop-mock:5000
+      - URL_PREFIX=
+      - DEBUG=1
+      - DEBUG_TB_INTERCEPT_REDIRECTS=1
+      - DEBUG_TB_ENABLED=1
+      - DEBUG_TB_TEMPLATE_EDITOR_ENABLED=1
+    tty: true
+    stdin_open: true
+    ports:
+      - "80:5000"
+    volumes:
+      - .:/app
+    working_dir: "/app"
+    command: flask run --host=0.0.0.0
+    networks:
+      - dev
+
+
+  ndop-mock:
+    build:
+      context: .
+      dockerfile: ci/ndop-mock/Dockerfile
+    environment:
+      - FLASK_APP=mock.py
+      - FLASK_ENV=development
+      - LISTEN_PORT=5000
+      - SERVER_NAME=localhost.dev
+    tty: true
+    stdin_open: true
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    working_dir: "/app/ndop-mock"
+    command: flask run --host=0.0.0.0
+    networks:
+      - dev
+
+networks:
+  dev:
+    external: true

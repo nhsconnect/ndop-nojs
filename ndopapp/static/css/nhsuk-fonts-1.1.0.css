@@ -1,0 +1,35 @@
+@font-face{
+  font-family:"Frutiger W01";
+  src:url("../fonts/nhsuk-fonts/fe232554-5489-4874-bb45-bd966c8c5932.eot?");
+  src:url("../fonts/nhsuk-fonts/fe232554-5489-4874-bb45-bd966c8c5932.eot?") format("eot"),
+      url("../fonts/nhsuk-fonts/0811514e-6660-4043-92c1-23d0b8caaa2f.woff2") format("woff2"),
+      url("../fonts/nhsuk-fonts/aeae8cac-ba4d-40d2-bbcf-936f2c7dcfe6.woff") format("woff"),
+      url("../fonts/nhsuk-fonts/caedf2e6-fbef-4928-b08e-1f975981ae8d.ttf") format("truetype"),
+      url("../fonts/nhsuk-fonts/7def0e34-f28d-434f-b2ec-472bde847115.svg") format("svg");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face{
+  font-family:"Frutiger W01";
+  src:url("../fonts/nhsuk-fonts/eb06b4c3-c0fd-4cd0-a9d9-a2954f6839a7.eot?");
+  src:url("../fonts/nhsuk-fonts/eb06b4c3-c0fd-4cd0-a9d9-a2954f6839a7.eot?") format("eot"),
+      url("../fonts/nhsuk-fonts/8c92eb68-ce37-4962-a9f4-5b47d336bd1c.woff2") format("woff2"),
+      url("../fonts/nhsuk-fonts/9bdfdcac-bbd4-46a9-9280-056c9a4438a2.woff") format("woff"),
+      url("../fonts/nhsuk-fonts/5dae3a6e-9b07-4c2f-aed2-1f5b8951261b.ttf") format("truetype"),
+      url("../fonts/nhsuk-fonts/eae74276-dd78-47e4-9b27-dac81c3411ca.svg") format("svg");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face{
+  font-family:"Frutiger W01";
+  src:url("../fonts/nhsuk-fonts/fb1e4ad2-83fa-4735-aa1b-900f4a36749f.eot?");
+  src:url("../fonts/nhsuk-fonts/fonts/fb1e4ad2-83fa-4735-aa1b-900f4a36749f.eot") format("eot"),
+      url("../fonts/nhsuk-fonts/221b3252-186e-4a32-a90b-cc0c3a4817d7.woff2") format("woff2"),
+      url("../fonts/nhsuk-fonts/a061c7a6-3b14-451e-883c-0f1661ac3d76.woff") format("woff"),
+      url("../fonts/nhsuk-fonts/558394f3-8981-4be9-8a8a-c23488eb9b6d.ttf") format("truetype"),
+      url("../fonts/nhsuk-fonts/1c437efb-925e-4bc5-96d0-c706bb400696.svg") format("svg");
+  font-weight: 800;
+  font-style: normal;
+}

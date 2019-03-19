@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ waiting_message }}{% endblock %}
+
+{% block extra_meta %}
+<meta http-equiv="refresh" content="{{ config.get('META_REFRESH_INTERVAL') }}"/>
+{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+  {% include 'snippet/messages.html' %}
+  <div class="column--full">
+    <h1 class="h2">{{ waiting_message }}</h1>
+  </div>
+</div>
+{% endblock %}

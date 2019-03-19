@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Something went wrong{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2">Unable to save your choice</h1>
+            <p>Sorry, we were unable to save your choice.</p>
+            <p>This was due to an error on our behalf. Your choice has not been updated.</p>
+            <p >Please try again later.</p>
+            <p><a class="button" href="/">Return to the start page</a></p>
+            <h2 class="h3">Other ways to manage your choice</h2>
+            <p>You can also choose use the non-digital service instead. Please see 
+                <a href="https://www.nhs.uk/your-nhs-data-matters/manage-your-choice/other-ways-to-manage-your-choice" >other ways to manage your choice</a>.
+            </p>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="197px" height="200px" viewBox="0 0 197 200" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.2 (47327) - http://www.bohemiancoding.com/sketch -->
+    <title>details</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <ellipse id="path-1" cx="31.5" cy="31" rx="31.5" ry="31"></ellipse>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="details">
+            <path d="M66.9975313,74.5 L117.632885,74.5" id="Line-5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="square"></path>
+            <path d="M120.476204,55.5 L135.5,55.5" id="Line-4" stroke="#FFFFFF" stroke-width="9" stroke-linecap="square"></path>
+            <path d="M108.5,74.5 L135.5,74.5" id="Line-4" stroke="#FFFFFF" stroke-width="9" stroke-linecap="square"></path>
+            <path d="M26,93.5 L123,93.5" id="Line-5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="square"></path>
+            <path d="M26,112.5 L137,112.5" id="Line-5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="square"></path>
+            <path d="M26,131.5 L137,131.5" id="Line-5" stroke="#FFFFFF" stroke-width="6" stroke-linecap="square"></path>
+            <path d="M118.5,93.5 L135.5,93.5" id="Line-4" stroke="#FFFFFF" stroke-width="9" stroke-linecap="square"></path>
+            <path d="M66.5,55.5 L124.002174,55.5" id="Line-4" stroke="#FFFFFF" stroke-width="6" stroke-linecap="square"></path>
+            <path d="M37.5,40.5 L37.5,2.5" id="Line-2" stroke="#FFFFFF" stroke-width="7"></path>
+            <path d="M156.5,3.5 L36.4497475,3.5 L3.5,36.4497475 L3.5,196.5 L156.5,196.5 L156.5,3.5 Z" id="Rectangle" stroke="#FFFFFF" stroke-width="7"></path>
+            <path d="M159.5,100.5 L159.5,54.5" id="Line-3" stroke="#FFFFFF" stroke-width="9"></path>
+            <path d="M3,37.5 L41,37.5" id="Line" stroke="#FFFFFF" stroke-width="7"></path>
+            <g id="Group" transform="translate(109.000000, 43.000000)">
+                <g id="Oval">
+                    <use stroke="#214B96" stroke-width="14" xlink:href="#path-1"></use>
+                    <use stroke="#FFFFFF" stroke-width="7" xlink:href="#path-1"></use>
+                </g>
+                <rect id="Rectangle-3" fill="#FFFFFF" transform="translate(70.500000, 63.500000) rotate(40.000000) translate(-70.500000, -63.500000) " x="51" y="55" width="39" height="17" rx="8.5"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
