@@ -1,34 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Review your details{% endblock %}
+{% block title %}Check your details{% endblock %}
 
 {% block content %}
 <div class="grid-row">
     <div class="column--two-thirds">
         <div class="reading-width">
-            <h1 class="h2">Review your details</h1>
+            <h1 class="h2">Check your details</h1>
             <div class="">
-                <h2 class="h3" id="review-your-details">Your details</h2>
-                <dl class="review-your-answers">
-                    <dt class="question" id="your-name">Your name</dt>
-                    <dd class="answer" id="your-name-answer">{{ details.firstName}} {{
-                        details.lastName }}
-                    </dd>
-                    <dd class="change">
-                        <a id="your-name-change"
-                           href="{{ routes.get_absolute('yourdetails.your_details') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
-                            Change <span class="util-visuallyhidden">your name</span>
-                        </a>
-                    </dd>
-                    <dt class="question" id="your-dob">Your date of birth</dt>
-                    <dd class="answer" id="your-dob-answer">{{ details.dob }}</dd>
-                    <dd class="change">
-                        <a id="your-dob-change"
-                           href="{{ routes.get_absolute('yourdetails.details_dob') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
-                            Change <span class="util-visuallyhidden">your date of birth</span>
-                        </a>
-                    </dd>
+                <dl class="review-your-answers" id="your-name">
+                    <div>
+                      <dt class="question">Your name</dt>
+                      <dd class="answer" id="your-name-answer">{{ details.firstName}} {{ details.lastName }}</dd>
+                      <dd class="change">
+                          <a id="your-name-change"
+                             href="{{ routes.get_absolute('yourdetails.your_details') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
+                              Change <span class="util-visuallyhidden">your name</span>
+                          </a>
+                      </dd>
+                    </div>
+                </dl>
+                <dl class="review-your-answers" id="your-dob">
+                    <div>
+                      <dt class="question">Your date of birth</dt>
+                      <dd class="answer" id="your-dob-answer">{{ details.dob }}</dd>
+                      <dd class="change">
+                          <a id="your-dob-change"
+                             href="{{ routes.get_absolute('yourdetails.details_dob') }}?next={{ routes.get_relative('yourdetails.your_details_review') }}">
+                              Change <span class="util-visuallyhidden">your date of birth</span>
+                          </a>
+                      </dd>
+                    </div>
+                </dl>
                     {% if details.postcode %}
-                        <dt class="question" id="your-postcode">Your Postcode</dt>
+                    <dl class="review-your-answers" id="your-postcode">
+                      <div>
+                        <dt class="question">Your Postcode</dt>
                         <dd class="answer" id="your-postcode-answer">{{ details.postcode }}</dd>
                         <dd class="change">
                             <a id="your-postcode-change"
@@ -36,9 +42,13 @@
                                 Change<span class="util-visuallyhidden">your postcode</span>
                             </a>
                         </dd>
+                      </div>
+                    </dl>
                     {% endif %}
                     {% if details.nhsNumber %}
-                        <dt class="question" id="your-nhsnumber">Your NHS Number</dt>
+                    <dl class="review-your-answers" id="your-nhsnumber">
+                      <div>
+                        <dt class="question">Your NHS Number</dt>
                         <dd class="answer" id="your-nhsnumber-answer">{{ details.nhsNumber }}</dd>
                         <dd class="change">
                             <a id="your-nhsnumber-change"
@@ -46,21 +56,20 @@
                                 Change<span class="util-visuallyhidden">your NHS number</span>
                             </a>
                         </dd>
+                      </div>
+                    </dl>
                     {% endif %}
-                </dl>
             </div>
             <form id="yourDetailsReview" method="POST"
                   action="{{ routes.get_absolute('yourdetails.your_details_review') }}">
                 {{ form.hidden_tag() }}
                 <p>
-                    This information will be used to find your contact details in our
-                    database. Once a match has been found, we will send you a one-time verification
-                    code.
+                  By continuing you agree to let us use your details to:
                 </p>
-                <p>
-                    You agree to let us search for your details in our database, so that we can send
-                    you a one-time security passcode.
-                </p>
+                <ul>
+                    <li>check who you are</li>
+                    <li>find your contact details from your health records so we can send you a security code</li>
+                </ul>
                 <input
                         type="submit" class="button"
                         id="detailsReviewContinueButton" value="Agree and submit">

@@ -5,19 +5,26 @@
 <div class="grid-row">
   <div class="column--full">
     <div class="callout callout--interruption alt">
-      <h1 class="h2">How to manage your choice online</h1>
       <div class="grid-row">
         <div class="column--three-quarters tablet">
+          <h1 class="h2">We need to check who you are before you can make your choice</h1>
           <div class="reading-width">
             <p>
-              Tell us your name, date of birth and NHS number or postcode.
+              We'll need your:
             </p>
             <p>
-              If we find your contact details, we'll then send you a security code. When your code is verified, you will be able to make your choice online.
+              <ul>
+                  <li>name</li>
+                  <li>date of birth</li>
+                  <li>postcode or NHS number</li>
+              </ul>
+            </p>
+            <p>
+              We'll use these details to find your contact details from your health records so we can send you a security code.
             </p>
             <form method="POST" id="landingPageForm" action="{{ routes.get_absolute('main.landing_page') }}">
               {{ form.csrf_token }}
-                <button id="yourDetailsButton" type="submit" class="button util-no-margin">Continue</button>
+              <button id="yourDetailsButton" type="submit" class="button util-no-margin">Continue</button>
             </form>
             <p>
               <a href="/privacynotice#what-information-do-we-collect-about-you" target="_blank">
@@ -27,10 +34,6 @@
           </div>
 
         </div>
-        <div class="column--one-quarter tablet">
-          <img alt="" class="util-displaynone-mobile" style="width:100%;" src="/static/images/choice-icon-white.svg" />
-        </div>
-
       </div>
     </div>
   </div>

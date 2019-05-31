@@ -3,7 +3,7 @@ import json
 from unittest.mock import patch, MagicMock
 from ndopapp import routes, create_app, constants
 from http import HTTPStatus
-from ndopapp.verification.controllers import lookupfailureerror
+from ndopapp.verification.controllers import lookup_failure_error
 from tests import common
 
 
@@ -30,12 +30,14 @@ class TestVerificationURLs(unittest.TestCase):
         assert HTTPStatus(result.status_code) == HTTPStatus.OK
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
+    @patch('ndopapp.utils.clean_state_model')
     @patch('ndopapp.verification.controllers.render_template')
     @patch('ndopapp.verification.controllers.request_code_by_pds')
-    @patch('ndopapp.verification.controllers.redirect')
+    @patch('ndopapp.verification.controllers.redirect_to_route')
     @patch('ndopapp.verification.controllers.VerificationOption')
     def test_verificationoption_redirecting(self, verification_option_mock,
-            client_redirect_mock, request_code_by_pds_mock, render_mock, _):
+            client_redirect_mock, request_code_by_pds_mock, render_mock,
+            clean_state_model_mock, _):
         """ Test that verificationoption template is redirecting properly """
         test_cases = (
             #(delivery_type, expected_result)
@@ -43,7 +45,6 @@ class TestVerificationURLs(unittest.TestCase):
             ('Email', constants.OTP_REQUEST_MAX_RETRIES),
             ('SMS', constants.OTP_REQUEST_SUCCESS),
             ('SMS', constants.OTP_REQUEST_MAX_RETRIES),
-            ('Unrecognised', constants.OTP_REQUEST_SUCCESS),
             ('SMS', constants.OTP_REQUEST_FAILURE),
         )
 
@@ -51,7 +52,7 @@ class TestVerificationURLs(unittest.TestCase):
 
         for case in test_cases:
             with self.subTest(case=case):
-                delivery_type, expected_result = case
+                delivery_type, expected_result, *optional_cases = case
 
                 form_mock = MagicMock()
 
@@ -65,23 +66,32 @@ class TestVerificationURLs(unittest.TestCase):
 
                 render_mock.return_value = "_"
 
+                clean_state_model_successful = None
+                if optional_cases:
+                    clean_state_model_successful, = optional_cases
+                    clean_state_model_mock.return_value = clean_state_model_successful
+
                 with self.client as c:
                     with c.session_transaction() as session:
                         session["sms"] = common.USER_DETAILS.get("sms")
                         session["email"] = common.USER_DETAILS.get("email")
 
-                result = self.client.post('/verificationoption',
-                                          data=json.dumps(common.USER_DETAILS),
-                                          headers=headers)
+                self.client.post('/verificationoption',
+                                 data=json.dumps(common.USER_DETAILS),
+                                 headers=headers)
 
                 if delivery_type not in ('Email', 'SMS'):
-                    client_redirect_mock.assert_called_with(routes.get_absolute("verification.contact_details_not_recognised"))
+                    if clean_state_model_successful == True:
+                        client_redirect_mock.assert_called_with("verification.contact_details_not_recognised")
+                    elif clean_state_model_successful == False:
+                        client_redirect_mock.assert_called_with("main.generic_error")
                 elif expected_result == constants.OTP_REQUEST_SUCCESS:
-                    client_redirect_mock.assert_called_with(routes.get_absolute("verification.enter_your_code"))
+                    client_redirect_mock.assert_called_with("verification.enter_your_code")
                 elif expected_result == constants.OTP_REQUEST_MAX_RETRIES:
-                    client_redirect_mock.assert_called_with(routes.get_absolute("verification.resend_code_error"))
+                    client_redirect_mock.assert_called_with("verification.resend_code_error")
                 else:
                     render_mock.assert_called()
+
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
     def test_verificationoption_template_rendering(self, _):
@@ -104,7 +114,9 @@ class TestVerificationURLs(unittest.TestCase):
         assert common.USER_DETAILS['email'] in str(result.data)
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    def test_verificationoption_without_email_address(self, _):
+    @patch('ndopapp.verification.controllers.request_code_by_pds')
+    def test_verificationoption_without_email_address(self, 
+            request_code_by_pds_mock, _):
         """ Test that verificationoption template is rendered properly
         without email"""
 
@@ -114,19 +126,18 @@ class TestVerificationURLs(unittest.TestCase):
             with c.session_transaction() as session:
                 session["sms"] = common.USER_DETAILS.get("sms")
 
+        request_code_by_pds_mock.return_value = constants.OTP_REQUEST_SUCCESS
         result = self.client.post('/verificationoption',
                                   data=json.dumps(common.USER_DETAILS),
                                   headers=headers)
 
-        assert HTTPStatus(result.status_code) == HTTPStatus.OK
-        assert common.USER_DETAILS['sms'] in str(result.data)
-        assert 'wrong_value_with_randomxxxx' not in str(result.data)
-        assert common.USER_DETAILS['email'] not in str(result.data)
-        assert 'phone number has' in str(result.data)
-        assert 'email address has' not in str(result.data)
+        assert HTTPStatus(result.status_code) == HTTPStatus.FOUND
+        assert "enteryourcode" in result.headers['Location']
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    def test_verificationoption_without_phone_number(self, _):
+    @patch('ndopapp.verification.controllers.request_code_by_pds')
+    def test_verificationoption_without_phone_number(self, 
+            request_code_by_pds_mock, _):
         """ Test that verificationoption template is rendered properly
         without sms"""
 
@@ -136,19 +147,16 @@ class TestVerificationURLs(unittest.TestCase):
             with c.session_transaction() as session:
                 session["email"] = common.USER_DETAILS.get("email")
 
+        request_code_by_pds_mock.return_value = constants.OTP_REQUEST_SUCCESS
         result = self.client.post('/verificationoption',
                                   data=json.dumps(common.USER_DETAILS),
                                   headers=headers)
 
-        assert HTTPStatus(result.status_code) == HTTPStatus.OK
-        assert common.USER_DETAILS['sms'] not in str(result.data)
-        assert 'wrong_value_with_randomxxxx' not in str(result.data)
-        assert common.USER_DETAILS['email'] in str(result.data)
-        assert 'phone number has' not in str(result.data)
-        assert 'email address has' in str(result.data)
+        assert HTTPStatus(result.status_code) == HTTPStatus.FOUND
+        assert "enteryourcode" in result.headers['Location']
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.verification.controllers.redirect')
+    @patch('ndopapp.verification.controllers.redirect_to_route')
     @patch('ndopapp.verification.controllers.CodeForm')
     @patch('ndopapp.verification.controllers.is_otp_verified_by_pds')
     def test_enteryourcode_status_is_200(self, is_otp_verified_by_pds_mock,
@@ -165,7 +173,7 @@ class TestVerificationURLs(unittest.TestCase):
         headers = {'Content-type': 'application/json', 'cookie': None}
         result = self.client.post('/enteryourcode',
                                   headers=headers)
-        client_redirect_mock.assert_called_with(routes.get_absolute('yourdetails.set_your_preference'))
+        client_redirect_mock.assert_called_with('yourdetails.set_your_preference')
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
     @patch('ndopapp.verification.controllers.app')
@@ -256,61 +264,32 @@ class TestVerificationURLs(unittest.TestCase):
     @patch('ndopapp.utils.clean_state_model', return_value=True)
     @patch('ndopapp.utils.is_session_valid', return_value=True) 
     @patch('ndopapp.verification.controllers.render_template', return_value="_")
-    def test_contactdetailsnotrecognised_clear_session_and_make_response(self, render_mock, 
+    def test_contactdetailsnotrecognised_make_response(self, render_mock,
             _, __, ___, ____):
-        """Test that contactdetailsnotrecognised clear session and make response"""
+        """Test that contactdetailsnotrecognised make response"""
 
         headers = {'Content-type': 'application/json', 'cookie': None}
-        result = self.client.post('/contactdetailsnotrecognised',
-                                  headers=headers)
-        render_mock.assert_called_with('contactdetailsnotrecognised.html', routes=routes)
-
-    @patch('ndopapp.utils.session')
-    @patch('ndopapp.utils.request')
-    @patch('ndopapp.utils.clean_state_model', return_value=False)
-    @patch('ndopapp.utils.is_session_valid', return_value=True) 
-    @patch('ndopapp.verification.controllers.redirect', return_value="_")
-    def test_contactdetailsnotrecognised_redirects_to_genericerror(self, redirect_mock, 
-            _, __, ___, ____):
-        """Test that contactdetailsnotrecognised redirects to genericerror"""
-
-        headers = {'Content-type': 'application/json', 'cookie': None}
-        result = self.client.post('/contactdetailsnotrecognised',
-                                  headers=headers)
-        redirect_mock.assert_called()
-
-    @patch('ndopapp.utils.session')
-    @patch('ndopapp.utils.request')
-    @patch('ndopapp.utils.clean_state_model', return_value=False)
-    @patch('ndopapp.utils.is_session_valid', return_value=True) 
-    @patch('ndopapp.verification.controllers.redirect', return_value="_")
-    def test_contactdetailsnotrecognised_redirects_to_genericerror(self, redirect_mock, 
-            _, __, ___, ____):
-        """Test that contactdetailsnotrecognised redirects to genericerror"""
-
-        headers = {'Content-type': 'application/json', 'cookie': None}
-        result = self.client.post('/contactdetailsnotrecognised',
-                                  headers=headers)
-        redirect_mock.assert_called()
+        result = self.client.get('/contactdetailsnotrecognised', headers=headers)
+        render_mock.assert_called_with('contact-details-not-recognised.html', routes=routes)
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.verification.controllers.render_template', return_value="_")
-    def test_resendcodeerror_clear_session_and_make_response(self, render_template_mock, _):
-        """Test that resendcodeerror clear session and make response"""
+    @patch('ndopapp.utils.render_template', return_value="_")
+    def test_resendcodeerror_make_response(self, render_template_mock, _):
+        """Test that make response"""
         self.client.get('/resendcodeerror')
-        render_template_mock.assert_called_with('resendcodeerror.html', routes=unittest.mock.ANY)
+        render_template_mock.assert_called_with('resend-code-error.html', routes=unittest.mock.ANY)
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.verification.controllers.render_template', return_value="_")
+    @patch('ndopapp.utils.render_template', return_value="_")
     def test_clear_session_and_make_response_for_pages(self, render_mock, _):
         """Test that resendcodeerror clear session and make response"""
 
         endpoints = [
-            ('resendcodeerror', 'resendcodeerror'),
-            ('contactdetailsnotfound', 'contactdetailsnotfound'),
+            ('resendcodeerror', 'resend-code-error'),
+            ('contactdetailsnotfound', 'contact-details-not-found'),
             ('agerestrictionerror', 'age-restriction-error'),
-            ('incorrectcodeerror', 'incorrectcodeerror'),
-            ('expiredcodeerror', 'expiredcodeerror'),
+            ('incorrectcodeerror', 'incorrect-code-error'),
+            ('expiredcodeerror', 'expired-code-error'),
         ]
         for endpoint in endpoints:
             with self.subTest(endpoint=endpoint):
@@ -336,7 +315,7 @@ class TestVerificationURLs(unittest.TestCase):
 
                 resend_code_by_pds_mock.return_value = result
 
-                result = self.client.get('/resendcode')
+                result = self.client.post('/resendcode')
                 with self.client as c:
                     with c.session_transaction() as session:
                         assert session.get('is_resent') is is_resent
@@ -357,8 +336,8 @@ class TestVerificationURLs(unittest.TestCase):
     ):
         test_cases = (
             # postcode, expected_html_file_to_render
-            ('abc132', 'lookupfailureerrorpostcode.html'),
-            ('',       'lookupfailureerror.html')
+            ('abc132', 'lookup-failure-error-postcode.html'),
+            ('',       'lookup-failure-error.html')
         )
 
         for case in test_cases:
@@ -369,19 +348,6 @@ class TestVerificationURLs(unittest.TestCase):
                 user_details.postcode = postcode
                 user_details_mock.return_value = user_details
 
-                lookupfailureerror.__wrapped__('')
+                lookup_failure_error.__wrapped__('')
 
                 render_template.assert_called_with(expected_html_file_to_render, routes=routes)
-
-    @patch('ndopapp.utils.session')
-    @patch('ndopapp.utils.request')
-    @patch('ndopapp.utils.clean_state_model', return_value=False)
-    @patch('ndopapp.utils.is_session_valid', return_value=True) 
-    @patch('ndopapp.verification.controllers.redirect', return_value="_")
-    def test_lookupfailureerror_redirects_to_genericerror(self, redirect_mock, *_):
-        """Test that lookupfailureerror redirects to genericerror"""
-
-        headers = {'Content-type': 'application/json', 'cookie': None}
-        result = self.client.post('/lookupfailureerror',
-                                  headers=headers)
-        redirect_mock.assert_called()

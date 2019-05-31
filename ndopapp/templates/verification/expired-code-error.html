@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Your security code has expired{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2" id="ageRestrictionErrorTitle">Your security code has expired</h1>
+            <p>You'll need to get a new code to make your choice.</p>
+            <form action="{{ routes.get_absolute('verification.resend_code') }}" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <p>
+                    <button type="submit" class="button">
+                        Get a new code
+                    </button>
+                </p>
+            </form>
+            {% include 'snippet/other-ways-to-manage-your-choice.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

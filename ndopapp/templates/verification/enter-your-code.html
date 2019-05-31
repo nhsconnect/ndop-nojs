@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %} {% if form.enterOtpInput.errors %}Error - {% endif %}Enter your security code  {% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            {% with messages = get_flashed_messages() %}
+            {% if messages %}
+            <div id="errorBox"
+                 class="error error-summary callout callout--error error-message error-message-active"
+                 role="alert" tabindex="-1">
+                {% if is_reenter_code %}
+                <h2 class="h3" id="error-summary">Incorrect code</h2>
+                <ul class="link-list">
+                    <li class="">
+                        <a id="enterOtpInputLink" class="error-text" href="#code-input">
+                            The code you provided was incorrect
+                        </a>
+                    </li>
+                </ul>
+                {% else %}
+                <h2 class="h3" id="error-summary">There is a problem</h2>
+                <ul class="link-list">
+                    <li class="">
+                        <a id="enterOtpInputLink" class="error-text" href="#code-input">
+                            Enter your security code
+                        </a>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
+            {% endif %}
+            {% endwith %}
+
+            <div class="reading-width">
+                {% if is_resent %}
+                    <div class="alert alert-success " id="flash-message" role="alert" tabindex="-1" style="opacity: 1;">
+                        <p>We've resent your security code.</p>
+                    </div>
+                {% endif %}
+                <form class="form" method="POST" id="enterOtpForm" action="{{ routes.get_absolute('verification.enter_your_code') }}">
+                    {{ form.hidden_tag() }}
+                    <div id="code-input" class="form-group form-row form-row-error-active">
+                        <h1 class="h2"><label id="enterOtpLabel" for="enterOtpInput">Enter your security code </label></h1>
+                        <span class="form-label__hint">We sent your security code by <span id="2fa-method">{{ selected_option }}</span></span>
+                        <div class="error error-message ">
+                            <p class="error-text error-label">Enter your code below</p>s
+                        </div>
+                        <div class="{{ 'form-row-error form-row-error-active' if messages }}">
+                            {% if form.enterOtpInput.errors %}
+                            {% for e in form.enterOtpInput.errors %}
+                            <p class="error error-message error-text error-label error-message-active" id="code-error">
+                                {{ e.message }}</p>
+                            {% endfor %}
+                            {% endif %}
+                            {{ form.enterOtpInput(class_="-small form-control", id="enterOtpInput") }}
+                            <input type="submit" id="enterOtpSubmitButton" class="button" role="button" value="Submit">
+                            <p>Didn't get your security code?
+                                {% if is_resent_max_reached %}
+                                <a href="{{ routes.get_absolute('verification.resend_code_error') }}" id="resend-code">Resend code</a>
+                                {% else %}
+                                <button class="button--link" formaction="{{ routes.get_absolute('verification.resend_code') }}" id="resend-code">Resend code</button>
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}{% if form.radio.errors %}Error - {% endif %}Get your security code{% endblock %}
+
+{% block extra_page_sections %}
+<div class="page-section">
+  <div class="reading-width">
+    <div class="grid-row">
+      <div class="column--two-thirds">
+        {% if form.radio.errors %}
+        <div id="errorBox" class="error error-summary callout callout--error error-message error-message-active" role="alert" tabindex="-1">
+            <h2 class="h3">There is a problem</h2>
+            <ul class="link-list">
+              <li>
+                <a id="radioOptionsLink" href="#verification-option">
+                  No option selected
+                </a>
+              </li>
+            </ul>
+        </div>
+        {% endif %}
+        <h1 class="h2">Get your security code</h1>
+        <div>
+          <p>
+            With the details you gave us we think we’ve found your contact details from your health records.
+            {% if user_details.email and not user_details.sms %}
+                We could only find your email address.
+            {% elif user_details.sms and not user_details.email %}
+                We could only find your mobile number.
+            {% endif %}
+          </p>
+          <p>We now need to send you a security code. After 30 minutes your security code will not work.</p>
+        </div>
+        <form id="verificationForm" class="form" action="{{ routes.get_absolute('verification.verification_option') }}" method="POST">
+        <fieldset id="verification-option" class="form-group form-row ">
+            {{ form.hidden_tag() }}
+            {% if user_details.email and user_details.sms %}
+                <legend class="h3 error-label">Where should we send your security code?</legend>
+                <div class="error error-message {{'error-message-active' if form.errors }} ">
+                  {% if form.errors %}
+                    <p class="error error-message error-text error-label error-message-active">To use the online service, select an option to continue</p>
+                  {% endif %}
+                </div>
+                <div class="error error-message ">
+                    <p class="error-text">To use the online service, select an option to continue</p>
+                </div>
+                <div>
+                    {% for subfield in form.radio %}
+                         {% if 'Email' in subfield|string %}
+                              <div class="form-group__item">
+                              {{ subfield(class='form-label form-label--radio', id="radioEmail") }}
+                              {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="radioEmail", id='label-for-radioEmail')}}
+                             </div>
+                         {% endif %}
+                         {% if 'SMS' in subfield|string %}
+                              <div class="form-group__item">
+                              {{ subfield(class='form-label form-label--radio', id="radioSMS") }}
+                              {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="radioSMS", id='label-for-radioSMS')}}
+                             </div>
+                         {% endif %}
+                    {% endfor %}
+                </div>
+            {% elif user_details.email %}
+                <h2 class="h3">
+                    We'll send your security code by email to 
+                    {% for subfield in form.radio %}
+                         {% if 'Email' in subfield|string %}
+                         <span class="otp-contact_field" id="contact-value">{{ subfield.label.text.split('to')[1] }}</span>
+                         {% endif %}
+                    {% endfor %}
+                </h2>
+            {% elif user_details.sms %}
+                <h2 class="h3">
+                    We'll send your security code by text to 
+                    {% for subfield in form.radio %}
+                         {% if 'SMS' in subfield|string %}
+                         <span class="otp-contact_field" id="contact-value">{{ subfield.label.text.split('to')[1] }}</span>
+                         {% endif %}
+                    {% endfor %}
+                </h2>
+            {% endif %}
+        </fieldset>
+        <input type="submit" id="verificationSubmitButton" class="button" role="button" value="Get code">
+        <p>
+          <a href="/nojs/contactdetailsnotrecognised" id="contactDetailsUnrecognised">What to do if you think these contact details are wrong</a>
+        </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

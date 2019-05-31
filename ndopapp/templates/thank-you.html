@@ -1,55 +1,60 @@
 {% extends "base.html" %}
-{% block title %}Thank you{% endblock %}
+{% block title %}Your choice has been saved{% endblock %}
 
 {% block content %}
 <div class="grid-row">
     <div class="column--two-thirds">
-        <p class="alert alert-success" role="alert" style="opacity:1;" tabindex="-1">Your choice has
-            been saved.</p>
-        <h1 class="h2">Thank you</h1>
+        <div class="reading-width">
+            <h1 class="h2">Your choice has been saved</h1>
 
-        {% if user_details.opted_out == "active" %}
+            {% if user_details.opted_out == "active" %}
 
-        <div id="not-shared">
-            <p>
-                Your confidential patient information will not be used for research and planning.
-            </p>
-            <h2 class="h3" id="what-happens-next">What happens next</h2>
-            <p>
-                It can take up to 21 days before your decision can be applied to future data
-                releases leaving the NHS. Your
-                choice will be applied gradually across all organisations that use confidential
-                patient information.
-            </p>
-            <p>
-                Your choice will be acknowledged by other organisations that use health and social
-                care information by March
-                2020.
-            </p>
-            <p>
-                You can update your choice at any time in the future using this service.
-            </p>
+            <div id="not-shared">
+                <p>
+                Your confidential patient information will not be shared for research and planning.
+                </p>
+                <p>
+                You can update your choice at any time using this service.
+                </p>
+                <h2 class="h3" id="what-happens-next-shared">More information</h2>
+                <p>
+                <a href="https://your-data-matters.service.nhs.uk/privacynotice">Visit our privacy notice</a> for more information on how and when your choice will be applied.
+                </p>
+            </div>
+
+            {% else %}
+
+            <div id="shared" class="">
+                <p>
+                Your confidential patient information can be shared for research and planning.
+                </p>
+                <p>
+                You can update your choice at any time using this service.
+                </p>
+                <h2 class="h3" id="what-happens-next-shared">More information</h2>
+                <p>
+                <a href="https://your-data-matters.service.nhs.uk/privacynotice">Visit our privacy notice</a> for more information on how and when your choice will be applied.
+                </p>
+            </div>
+            {% endif %}
         </div>
-
-        {% else %}
-
-        <div id="shared" class="">
-            <p>
-                Your confidential patient information can be used to help improve health and care
-                services for the future.
-            </p>
-            <h2 class="h3" id="what-happens-next">What happens next</h2>
-            <p>
-                If you have previously opted out of using your confidential patient information, it
-                can take up to 21 days
-                before your opt-out is withdrawn.
-            </p>
-            <p>
-                You can update your choice at any time in the future using this service.
-            </p>
-        </div>
-        {% endif %}
-
     </div>
-</div>
+
+{% endblock %}
+
+{% block feedback_survey_banner %}
+  <div class="nhsuk-feedback-banner nhsuk-feedback-banner--no-js" id="nhsuk-feedback-banner" style="display:block">
+    <div class="page-section "> 
+      <div class="grid-row">
+        <div class="column--full">
+          <div class="nhsuk-feedback-banner__content">
+            <h2 class="nhsuk-feedback-banner__heading h4">Help us make this website better</h2>
+            <p class="nhsuk-feedback-banner__message">
+              <a class="nhsuk-u-nowrap" id="feedback-survey-url" target="_blank" href={{ config.get("THANKYOU_PAGE_FEEDBACK_SURVEY_ENDPOINT") }}>Tell us what worked and what we could improve</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 {% endblock %}

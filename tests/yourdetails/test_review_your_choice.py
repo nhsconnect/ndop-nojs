@@ -2,7 +2,7 @@ import unittest
 import requests_mock
 import json
 from ndopapp import routes, create_app
-from unittest.mock import patch
+from flask import Flask
 from http import HTTPStatus
 from unittest.mock import patch
 
@@ -69,12 +69,12 @@ class YourDetailsReviewYourChoiceTests(unittest.TestCase):
         assert choice == expected_choice
 
     @patch('ndopapp.yourdetails.controllers.get_confirmation_delivery_details', return_value=None)
-    @patch('ndopapp.yourdetails.controllers.redirect')
+    @patch('ndopapp.yourdetails.controllers.redirect_to_route')
     def test_review_your_choice_redirects_to_generic_error_when_get_confirmation_delivery_details_returns_none(self, redirect_mock, _):
+        with Flask(__name__).app_context():
+            review_your_choice.__wrapped__('some session id')
 
-        review_your_choice.__wrapped__('some session id')
-
-        redirect_mock.assert_called_with(routes.get_absolute('yourdetails.generic_error'))
+        redirect_mock.assert_called_with('main.generic_error')
 
     @requests_mock.Mocker(kw='mock')
     @patch('ndopapp.utils.is_session_valid', return_value=True)
@@ -93,7 +93,8 @@ class YourDetailsReviewYourChoiceTests(unittest.TestCase):
         result = self.client.get(routes.get_raw('yourdetails.review_your_choice'))
 
         assert HTTPStatus(result.status_code) == HTTPStatus.FOUND
-        assert routes.get_absolute('yourdetails.generic_error') == result.headers['Location']
+        assert routes.get_absolute('main.generic_error') == result.headers['Location']
+
 
 if __name__ == '__main__':
     unittest.main()

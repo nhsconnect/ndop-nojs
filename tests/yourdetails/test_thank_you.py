@@ -34,12 +34,12 @@ class YourDetailsTestThankYouTests(unittest.TestCase):
 
         test_cases = [
             # (is_session_valid, opted_out, flask_session, expected_status, expected_text, expected_text_id, expected_location)
-            (True,  'active',   {'is_successfully_stored': True},  HTTPStatus.OK,    'will not be used', 'not-shared', None),
-            (True,  'inactive', {'is_successfully_stored': True},  HTTPStatus.OK,    'can be used',      'shared',     None),
+            (True,  'active',   {'is_successfully_stored': True},  HTTPStatus.OK,    'will not be shared', 'not-shared', None),
+            (True,  'inactive', {'is_successfully_stored': True},  HTTPStatus.OK,    'can be shared',      'shared',     None),
             (True,  'active',   {'is_successfully_stored': False}, HTTPStatus.FOUND, None, None, routes.get_absolute('yourdetails.choice_not_saved')),
             (True,  'inactive', {'is_successfully_stored': False}, HTTPStatus.FOUND, None, None, routes.get_absolute('yourdetails.choice_not_saved')),
-            (False, 'inactive', {},                                HTTPStatus.OK, 'Sorry, you\'ll have to start again', 'mainBody', None),
-            (True,  'inactive', {},                                HTTPStatus.OK, 'Sorry, you\'ll have to start again', 'mainBody', None),
+            (False, 'inactive', {},                                HTTPStatus.OK, 'Sorry, you\'ll need to start again', 'mainBody', None),
+            (True,  'inactive', {},                                HTTPStatus.OK, 'Sorry, you\'ll need to start again', 'mainBody', None),
         ]
 
 
@@ -76,10 +76,10 @@ class YourDetailsTestThankYouTests(unittest.TestCase):
         thank_you.__wrapped__()
         session_mock.clear.assert_called()
 
-    @patch('ndopapp.yourdetails.controllers.render_template', return_value='_')
+    @patch('ndopapp.utils.render_template', return_value='_')
     def test_generic_error_renders_error_html(self, render_template_mock):
 
-        self.client.post(routes.get_raw('yourdetails.generic_error'))
+        self.client.get(routes.get_raw('main.generic_error'))
 
         render_template_mock.assert_called_with('error.html', routes=unittest.mock.ANY)
 

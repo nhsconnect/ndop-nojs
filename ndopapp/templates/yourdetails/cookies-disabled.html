@@ -1,26 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Something went wrong{% endblock %}
+
+{% block title %}You must enable cookies to make your choice online{% endblock %}
 
 {% block content %}
 <div class="grid-row">
     <div class="column--two-thirds">
-        <h1 class="h2">Enable cookies to continue</h1>
-
-        <p>The &#39;{{ config.get("SERVICE_NAME") }}&#39; service puts small files (known as &#39;cookies&#39;) onto your computer to keep your visit secure.</p>
-        <p>
-        To be able to use this service online, you need to enable cookies.
-        </p>
-        <p>Find out more about
-        <a target="_blank" rel="noopener noreferrer" href="https://www.aboutcookies.org/">how to manage cookies<span class="util-visuallyhidden"> - Page opens in new window</span></a>
-        <span aria-hidden="true"> (opens in new window)</span>.
-        </p>
-        <br/>
-        <h2 class="h3" id="other-ways-to-manage-your-choice">Other ways to manage your choice </h2>
-        <p>
-        If you are unable or do not wish to use our online service, see
-        <br/>
-        <a href="https://www.nhs.uk/your-nhs-data-matters/manage-your-choice/other-ways-to-manage-your-choice">other ways to manage your choice</a>.
-        </p>
+        <div class="reading-width">
+            <h1 class="h2">You must enable cookies to make your choice online</h1>
+            <p>We put small files called cookies onto your device to keep your visit secure. <a href="/cookiespolicy">Find out more or manage your cookie settings.</a></p>
+            {% include 'snippet/other-ways-to-manage-your-choice.html' %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -1,8 +1,6 @@
-import requests_mock
 import unittest
 from unittest.mock import patch
 from ndopapp import routes, create_app
-from http import HTTPStatus
 
 from tests import common
 from ndopapp import constants
@@ -21,11 +19,12 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
         self.client = None
         self.app = None
 
+    @patch('ndopapp.utils.clean_state_model', return_value=True)
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.redirect')
+    @patch('ndopapp.yourdetails.controllers.redirect_to_route')
     @patch('ndopapp.yourdetails.controllers.check_status_of_pds_search_result')
     def test_waiting_for_results_redirecting_when_search_fails(self,
-            check_status_of_pds_search_result_mock, redirect_mock, _):
+            check_status_of_pds_search_result_mock, redirect_mock, *_):
         """ Test waiting_for_results page redirect to lookupfailureerror when pds search fails"""
 
         redirect_mock.return_value = "_"
@@ -34,14 +33,13 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
         with self.client as c:
             with c.session_transaction() as session:
                 session['timeout_threshold'] = constants.FAR_IN_THE_FUTURE
-        self.client.post('/waiting-for-results')
 
-        self.client.post(routes.get_raw("verification.waiting_for_results"))
+        self.client.get(routes.get_raw("verification.waiting_for_results"))
 
-        redirect_mock.assert_called_with(routes.get_absolute("verification.lookup_failure_error"))
+        redirect_mock.assert_called_with("verification.lookup_failure_error")
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.redirect')
+    @patch('ndopapp.yourdetails.controllers.redirect_to_route')
     def test_waiting_for_results_redirecting_on_timeout(self, redirect_mock, _):
         """ Test waiting_for_results page redirect to genericerror on timeout"""
 
@@ -51,9 +49,9 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
             with c.session_transaction() as session:
                 session['timeout_threshold'] = 1
 
-        self.client.post(routes.get_raw("verification.waiting_for_results"))
+        self.client.get(routes.get_raw("verification.waiting_for_results"))
 
-        redirect_mock.assert_called_with(routes.get_absolute("yourdetails.generic_error"))
+        redirect_mock.assert_called_with("main.generic_error")
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
     @patch('ndopapp.yourdetails.controllers.render_template')
@@ -65,13 +63,13 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
         render_mock.return_value = "_"
         check_status_of_pds_search_result_mock.return_value = "incomplete"
 
-        self.client.post(routes.get_raw("verification.waiting_for_results"))
+        self.client.get(routes.get_raw("verification.waiting_for_results"))
 
         render_mock.assert_called_with('waiting-for-results.html',
                 waiting_message=constants.PDS_SEARCH_WAITING_MESSAGE, routes=routes)
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.redirect')
+    @patch('ndopapp.yourdetails.controllers.redirect_to_route')
     @patch('ndopapp.yourdetails.controllers.check_status_of_pds_search_result')
     def test_waiting_for_results_redirecting_when_no_contact_details(self,
             check_status_of_pds_search_result_mock, redirect_mock, _):
@@ -80,16 +78,16 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
         redirect_mock.return_value = "_"
         check_status_of_pds_search_result_mock.return_value = "insufficient_data"
 
-        self.client.post(routes.get_raw("verification.waiting_for_results"))
+        self.client.get(routes.get_raw("verification.waiting_for_results"))
 
-        redirect_mock.assert_called_with(routes.get_absolute("verification.contact_details_not_found"))
+        redirect_mock.assert_called_with("verification.contact_details_not_found")
         with self.client as c:
             with c.session_transaction() as session:
                 assert not session.get("email")
                 assert not session.get("sms")
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.redirect')
+    @patch('ndopapp.yourdetails.controllers.redirect_to_route')
     @patch('ndopapp.yourdetails.controllers.check_status_of_pds_search_result')
     def test_waiting_for_results_redirecting_when_timeout(self,
             check_status_of_pds_search_result_mock, redirect_mock, _):
@@ -98,12 +96,12 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
         redirect_mock.return_value = "_"
         check_status_of_pds_search_result_mock.return_value = "pds_request_timeout"
 
-        self.client.post(routes.get_raw("verification.waiting_for_results"))
+        self.client.get(routes.get_raw("verification.waiting_for_results"))
 
-        redirect_mock.assert_called_with(routes.get_absolute("yourdetails.generic_error"))
+        redirect_mock.assert_called_with("main.generic_error")
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.redirect')
+    @patch('ndopapp.yourdetails.controllers.redirect_to_route')
     @patch('ndopapp.yourdetails.controllers.check_status_of_pds_search_result')
     def test_waiting_for_results_redirecting_when_having_contact_details(self,
             check_status_of_pds_search_result_mock, redirect_mock, _):
@@ -116,9 +114,9 @@ class YourDetailsWaitingForResultsTests(unittest.TestCase):
                 session["sms"] = common.USER_DETAILS.get("sms")
                 session["email"] = common.USER_DETAILS.get("email")
 
-        self.client.post(routes.get_raw("verification.waiting_for_results"))
+        self.client.get(routes.get_raw("verification.waiting_for_results"))
 
-        redirect_mock.assert_called_with(routes.get_absolute("verification.verification_option"))
+        redirect_mock.assert_called_with("verification.verification_option")
 
 
 if __name__ == '__main__':

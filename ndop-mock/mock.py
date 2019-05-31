@@ -259,6 +259,7 @@ def check_user_returning_500(session_cookie):
         return True
     return False
 
+
 if __name__ == "__main__":
     app.run()
 

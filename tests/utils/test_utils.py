@@ -48,16 +48,6 @@ class TestUtils(unittest.TestCase):
     def test_is_session_valid_when_session_is_none(self):
         self.assertFalse(utils.is_session_valid(None))
 
-    @patch('ndopapp.utils.app')
-    @patch('ndopapp.utils.redirect')
-    def test_catch_unhandled_exception(self, redirect_mock, _):
-
-        def bang():
-            raise Exception('bang')
-        wrapper = utils.catch_unhandled_exceptions(bang)
-        wrapper()
-        redirect_mock.assert_called_with(routes.get_absolute('yourdetails.generic_error'))
-
     @patch('ndopapp.utils.routes')
     def test_ensure_safe_redirect_url_returns_landing_page_for_unknown_urll(self,
             routes_mock):
@@ -175,7 +165,6 @@ class TestUtils(unittest.TestCase):
         utils.clean_state_model()
         put_state_model_mock.assert_called_with(clear_state_model)
 
-
     def test_ensure_leading_slash(self):
 
         ret = config.ensure_leading_slash('error.html')
@@ -191,3 +180,53 @@ class TestUtils(unittest.TestCase):
         with self.assertRaises(Exception) as context:
             routes.get_raw('incorrect_route')
         self.assertTrue('Invalid route' in str(context.exception))
+
+
+class TestCalculateNHSNumberCheckDigit(unittest.TestCase):
+
+    def test_standard_case(self):
+        self.assertEqual(utils.calculate_nhs_number_check_digit("999888002"), 5)
+
+    def test_modulo_eleven_case(self):
+        self.assertEqual(utils.calculate_nhs_number_check_digit("283327282"), 0)
+
+
+class TestIsNHSNumberValid(unittest.TestCase):
+
+    @patch('ndopapp.utils.app')
+    def test_nonsense_values_rejected(self, _):
+        class Klass:
+            pass
+
+        self.assertFalse(utils.is_nhs_number_valid(None))
+        self.assertFalse(utils.is_nhs_number_valid(""))
+        self.assertFalse(utils.is_nhs_number_valid(True))
+        self.assertFalse(utils.is_nhs_number_valid(False))
+        self.assertFalse(utils.is_nhs_number_valid({}))
+        self.assertFalse(utils.is_nhs_number_valid([]))
+        self.assertFalse(utils.is_nhs_number_valid(Klass()))
+        self.assertFalse(utils.is_nhs_number_valid(1))
+
+    @patch('ndopapp.utils.app')
+    def test_alphabetic_strings_rejected(self, _):
+        self.assertFalse(utils.is_nhs_number_valid("1234.53355"))
+        self.assertFalse(utils.is_nhs_number_valid("1234A53355"))
+
+    @patch('ndopapp.utils.app')
+    def test_strings_not_length_ten_rejected(self, _):
+        self.assertFalse(utils.is_nhs_number_valid("123456789"))
+        self.assertFalse(utils.is_nhs_number_valid("12345678901"))
+
+    @patch('ndopapp.utils.app')
+    def test_modulo_check_failures_rejected(self, _):
+        self.assertFalse(utils.is_nhs_number_valid("1234567890"))
+        self.assertFalse(utils.is_nhs_number_valid("2833272828"))
+        self.assertFalse(utils.is_nhs_number_valid("3884383828"))
+        self.assertFalse(utils.is_nhs_number_valid("9999999977"))
+
+    @patch('ndopapp.utils.app')
+    def test_valid_nhs_numbers_accepted(self, _):
+        self.assertTrue(utils.is_nhs_number_valid("9999999999"))
+        self.assertTrue(utils.is_nhs_number_valid("9998880025"))
+        self.assertTrue(utils.is_nhs_number_valid("9998880017"))
+        self.assertTrue(utils.is_nhs_number_valid("9998880009"))

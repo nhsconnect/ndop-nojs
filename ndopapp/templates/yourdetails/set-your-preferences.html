@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block title %}{% if form.radio.errors %}Error - {% endif %}Make your choice{% endblock %}
+
+{% block content %}
+<div class="grid-row">
+    <div class="column--two-thirds">
+    <div class="reading-width">
+        {% if current_preference in ["active", "inactive"] %}
+        <p class="alert alert-info" style="opacity:1;" role="alert" tabindex="-1" id="existing-preference" >
+            Your current choice: You
+            <strong>
+                {% if current_preference == "inactive" %}
+                allow
+                {% else %}
+                do not allow
+                {% endif %}
+            </strong>
+            the use of your confidential patient information
+        </p>
+        {% endif %}
+        {% include 'snippet/messages.html' %}
+        <h1 class="h2">Make your choice</h1>
+        <p>
+            Your confidential patient information from your health records can be used for improving health, care and services,
+            including:
+        </p>
+        <ul>
+            <li>planning to improve health and care services</li>
+            <li>
+                research to find a cure for serious illnesses
+            </li>
+        </ul>
+
+        <p>
+            Your decision will not affect your individual care and you can change your mind anytime you like.
+        </p>
+
+        <form id="setPreferencesForm" class="form" method="POST" action="{{ routes.get_absolute('yourdetails.set_your_preference') }}">
+            <fieldset id="preference" class="form-group form-row util-no-margin {{'form-row-error-active has-error' if form.errors}}">
+                <legend class="h3">
+                    I allow my confidential patient information to be used for research and planning:
+                </legend>
+                <div id="single-question-input-error" class="error error-message{{' error-message-active error-label form-row-error-active ' if form.errors }}">
+                    <p class="error-text">Select your choice</p>
+                </div>
+
+                {{ form.hidden_tag() }}
+                {% for subfield in form.radio %}
+              {% if subfield.label.text == 'Yes' %}
+                  <div class="form-group__item">
+                  {{ subfield(class='form-label form-label--radio', id="single-opted-in", value="Yes" ) }}
+                  {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="single-opted-in") }}
+                 </div>
+              {% endif %}
+              {% if subfield.label.text == 'No' %}
+                    <div class="form-group__item">
+                    {{ subfield(class='form-label form-label--radio', id="single-opted-out", value="No" ) }}
+                    {{ subfield.label(class='form-label form-label--radio multiple-choice--radio lg', for="single-opted-out") }}
+                   </div>
+                {% endif %}
+                {% endfor %}
+
+            </fieldset>
+            <input id="setPreferencesSubmitButton" class="button" type="submit" name="submit-pref" value="Continue">
+        </form>
+      </div>
+    </div>
+</div>
+{% endblock %}

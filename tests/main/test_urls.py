@@ -1,7 +1,7 @@
 import unittest
 
 from ndopapp import routes, create_app
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from http import HTTPStatus
 
 
@@ -33,12 +33,12 @@ class TestURLs(unittest.TestCase):
         assert HTTPStatus(result.status_code) == HTTPStatus.OK
         assert 'ndop_seen_cookie_message' in result.headers['Set-Cookie']
 
-    @patch('ndopapp.main.controllers.redirect', return_value="_")
+    @patch('ndopapp.main.controllers.redirect_to_route', return_value="_")
     def test_landingpage_post(self, make_response_mock):
         """ Test landing page posts to your_details page """
-        result = self.client.post('/landingpage')
+        self.client.post('/landingpage')
 
-        make_response_mock.assert_called_with(routes.get_absolute('yourdetails.your_details'))
+        make_response_mock.assert_called_with('yourdetails.your_details')
 
 
 if __name__ == '__main__':

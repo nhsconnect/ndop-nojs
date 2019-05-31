@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Sorry, we cannot accept your NHS number{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2">Sorry, we cannot accept your NHS number</h1>
+            <p>
+                Check the NHS number you entered. If you typed your NHS number incorrectly or you typed a number that
+                is not your NHS number you can
+                <a href="{{ routes.get_absolute('yourdetails.details_nhs_number') }}">
+                    try again.
+                </a>
+            </p>
+            <p>If you typed your NHS number correctly, contact us for help making your choice.</p>
+            <p>Telephone: 0300 303 5678<br />
+                Monday to Friday, 9am to 5pm excluding bank holidays</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

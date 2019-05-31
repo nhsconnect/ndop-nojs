@@ -39,7 +39,7 @@ class PipeFormatter(logging.Formatter):
 
 def record_factory(*args, **kwargs):
     record = logging.LogRecord(*args, **kwargs)
-    record.environment = os.environ.get('ENV_NAME')
+    record.environment = os.environ.get('AWS_ENV_NAME')
 
     if has_request_context():
         # Request attributes

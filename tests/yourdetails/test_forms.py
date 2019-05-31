@@ -26,7 +26,7 @@ class YourDetailsFormsTests(unittest.TestCase):
             form.last_name.data = 'dave'
             self.assertFalse(form.validate())
             self.assertEqual(form.first_name.errors, [
-                             {'message': 'First name is missing', 'id': 'firstNameInputLink', 'href': 'firstNameContainer', 'error_alert': 'Enter your first name'}])
+                             {'message': 'Enter your first name', 'id': 'firstNameInputLink', 'href': 'firstNameContainer', 'error_alert': 'Enter your first name'}])
 
     def test_name_form_missing_last_name(self):
         with self.app.test_request_context('/'):
@@ -34,16 +34,16 @@ class YourDetailsFormsTests(unittest.TestCase):
             form.first_name.data = 'dave'
             self.assertFalse(form.validate())
             self.assertEqual(form.last_name.errors, [
-                             {'message': 'Last name is missing', 'id': 'lastNameInputLink', 'href': 'lastNameContainer', 'error_alert': 'Enter your last name'}])
+                             {'message': 'Enter your last name', 'id': 'lastNameInputLink', 'href': 'lastNameContainer', 'error_alert': 'Enter your last name'}])
 
     def test_name_form_missing_both_names(self):
         with self.app.test_request_context('/'):
             form = NameForm()
             self.assertFalse(form.validate())
             self.assertEqual(form.first_name.errors, [
-                             {'message': 'First name is missing', 'id': 'firstNameInputLink', 'href': 'firstNameContainer', 'error_alert': 'Enter your first name'}])
+                             {'message': 'Enter your first name', 'id': 'firstNameInputLink', 'href': 'firstNameContainer', 'error_alert': 'Enter your first name'}])
             self.assertEqual(form.last_name.errors, [
-                             {'message': 'Last name is missing', 'id': 'lastNameInputLink', 'href': 'lastNameContainer', 'error_alert': 'Enter your last name'}])
+                             {'message': 'Enter your last name', 'id': 'lastNameInputLink', 'href': 'lastNameContainer', 'error_alert': 'Enter your last name'}])
 
     def test_name_form_last_name_too_long(self):
         with self.app.test_request_context('/'):
@@ -82,7 +82,7 @@ class YourDetailsFormsTests(unittest.TestCase):
         test_cases = (
             (35, 8, 2000),
             (1, 15, 1988),
-            (24, 2, 1890),
+            (24, 2, 890),
             (99, 99, 9999),
             (None, 1, 2000),
             (None, None, None),
@@ -113,7 +113,7 @@ class YourDetailsFormsTests(unittest.TestCase):
             form = ChoiceOption()
             form.radio.data = None
             self.assertFalse(form.validate())
-            self.assertEqual(form.errors, {'radio': ['Not a valid choice'], 'preference': [{'message': 'No choice selected', 'href': 'preference', 'id': 'setPreferencesInputLink'}]})
+            self.assertEqual(form.errors, {'radio': ['Not a valid choice'], 'preference': [{'message': 'Select your choice', 'href': 'preference', 'id': 'setPreferencesInputLink'}]})
 
 
 if __name__ == '__main__':

@@ -1,5 +1,7 @@
 import difflib
 from ndopapp.models import NDOP_Error
+from flask import current_app as app, redirect
+
 prefix = ''
 host = ''
 
@@ -8,7 +10,7 @@ def get_raw(controller_name):
     routes = {
         "main.root": "",
         "main.landing_page": "landingpage",
-
+        "main.generic_error": "genericerror",
 
         "yourdetails.your_details": "yourdetails",
         "yourdetails.details_dob": "detailsdob",
@@ -16,14 +18,14 @@ def get_raw(controller_name):
         "yourdetails.details_nhs_number": "detailsnhsnumber",
         "yourdetails.details_postcode": "detailspostcode",
         "yourdetails.your_details_review": "yourdetailsreview",
-        "yourdetails.generic_error": "genericerror",
         "yourdetails.set_your_preference": "setyourpreference",
-        "yourdetails.submit_preference": "submitpreference",
         "yourdetails.review_your_choice": "reviewyourchoice",
         "yourdetails.store_preference_result": "storepreferenceresult",
-        "yourdetails.confirmation_sender": "confirmationsender",
         "yourdetails.thank_you": "thankyou",
         "yourdetails.choice_not_saved": "choicenotsaved",
+        "yourdetails.nhs_number_not_accepted": "nhsnumbernotaccepted",
+        "yourdetails.invalid_nhs_number": "invalidnhsnumber",
+        "yourdetails.set_preference_error": "setpreferenceerror",
 
         "verification.enter_your_code": "enteryourcode",
         "verification.contact_details_not_recognised": "contactdetailsnotrecognised",
@@ -54,3 +56,8 @@ def get_absolute(controller_name):
 
 def make_absolute(path):
     return host.strip('/') + path
+
+
+def redirect_to_route(controller_name, code=302, Response=None):
+    app.logger.info("redirecting", {'location': controller_name})
+    return redirect(get_absolute(controller_name), code, Response)

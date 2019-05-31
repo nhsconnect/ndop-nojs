@@ -8,21 +8,19 @@
 
   <form id="yourDetailsPostcodeForm" method="POST" action="">
   {{ form.csrf_token }}
-    <h1 class="h2"><label for="postcode">Enter your postcode</label></h1>
+    <h1 class="h2"><label for="postcode-input">Enter your postcode</label></h1>
     <div class="grid-row">
       <div id="postcodeContainer" class="column--three-quarters" tabindex="-1">
         <div id="postcode">
           <div class="{{'form-row-error form-row-error-active has-error' if form.postcode.errors }}" >
+
+              <span class="form-label__hint">This must be your postcode you have registered with your GP practice.</span>
+              <span class="form-label__hint">For example, 'LS1 6AE'</span>
               {% if form.postcode.errors %}
                 {% for e in form.postcode.errors %}
                   <p class="error error-message error-text error-label error-message-active" id="postcode-error">{{ e.error_alert }}</p>
                 {% endfor %}
               {% endif %}
-
-              <label for="postcode-input">
-                  <span class="form-label__hint">This must be your postcode you have registered with your GP practice.</span>
-                  <span class="form-label__hint">For example, 'LS1 6AE'</span>
-              </label>
               {{ form.postcode(class_="-small form-control", id="postcode-input") }}
             </div>
           </div>
@@ -30,7 +28,7 @@
       </div>
       <input type="submit" class="button" id="detailsPostcodeContinueButton" value="Continue">
       <p>
-        <a href="{{ routes.get_absolute('yourdetails.details_auth_option') }}" id="detailsPostcodeGoBackLink">Go back</a>
+        <a href="{{ routes.get_absolute('yourdetails.details_auth_option') }}" id="detailsPostcodeGoBackLink">Go back to the previous page</a>
       </p>
     </form>
   </div>

@@ -14,7 +14,7 @@ def ensure_leading_slash(string):
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 # Arbitrary secret key for session state that gets generated on deployment
-ENCODED_SECRET_KEY = os.environ.get('SECRET_KEY', 'A_DEFAULT_SECRET_KEY')
+ENCODED_SECRET_KEY = os.environ.get('SECRET_KEY', 'A/DEFAULT/SECRET/KEY')
 
 NDOP_MOCK_HOST = os.environ.get('NDOP_MOCK_HOST', "localhost")
 NDOP_MOCK_PORT = os.environ.get('NDOP_MOCK_PORT', 5001)
@@ -25,11 +25,16 @@ API_URL = ensure_trailing_slash(os.environ.get("API_URL", NDOP_MOCK_URL))
 URL_PREFIX = os.environ.get("URL_PREFIX", "")
 SERVER_NAME = os.environ.get('SERVER_NAME')
 
+IS_LOCAL_ENV = os.environ.get('LOCAL_DEVELOPMENT', 'False').lower() in ('true', '1')
+
 if len(URL_PREFIX) > 0:
     URL_PREFIX = ensure_leading_slash(URL_PREFIX)
 
 
 class Config(object):
+    SESSION_COOKIE_SECURE = False if IS_LOCAL_ENV else True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = 'Strict'
     SECRET_KEY = b64decode(ENCODED_SECRET_KEY)
     PDS_REQUEST_TIMEOUT = 30
     META_REFRESH_INTERVAL = 5
@@ -53,7 +58,11 @@ class Config(object):
 
     AWS_ACCOUNT_ID = os.environ.get('AWS_ACCOUNT_ID')
     AWS_DEFAULT_REGION = os.environ.get('AWS_DEFAULT_REGION', "eu-west-2")
-    AWS_ENV_NAME = os.environ.get('ENV_NAME')
+    AWS_ENV_NAME = os.environ.get('AWS_ENV_NAME')
+
+    WTF_CSRF_SSL_STRICT = False
+
+    THANKYOU_PAGE_FEEDBACK_SURVEY_ENDPOINT = "https://nhsdigital.eu.qualtrics.com/jfe/form/SV_eqvKn0D54sdz8c5"
 
 
 class TestConfig(Config):

@@ -4,35 +4,36 @@ import json
 import boto3
 from http import HTTPStatus
 
-from flask import request, current_app as app, \
-        render_template, session, make_response, redirect
+from flask import request, current_app as app, render_template, session
+from flask.views import View
 
 from ndopapp import routes
 import traceback
 
 
+class TemplateView(View):
+    methods = ['GET']
+
+    def __init__(self, view_name, template, requires_session=True):
+        self.view_name = view_name
+        self.template = template
+        self.requires_session = requires_session
+
+    @classmethod
+    def as_view(cls, name, *class_args, **class_kwargs):
+        return super().as_view(name, name, *class_args, **class_kwargs)
+
+    def dispatch_request(self):
+        if self.requires_session:
+            session_id = request.cookies.get('session_id_nojs')
+            if not is_session_valid(session_id):
+                return render_template('session-expired.html', routes=routes)
+        return render_template(self.template, routes=routes)
+
+
 def create_error_messages_dict(*args):
-    messages = {}
-    counter = 0
-
-    for message in args:
-        messages[counter] = [message]
-        counter = counter + 1
-
-    return messages
-
-def catch_unhandled_exceptions(func):
-    """catching the unhandled exceptions bubbled up and redirect them to generic error page"""
-    @functools.wraps(func)
-    def catch_exceptions_wrapper(*args):
-        try:
-            return func(*args)
-        except Exception as e:
-            log_safe_exception(e)
-            return redirect(routes.get_absolute("yourdetails.generic_error"))
+    return {i: [message] for i, message in enumerate(args)}
     
-    return catch_exceptions_wrapper
-
 
 def check_session_id_if_no_flask_session(func):
     @functools.wraps(func)
@@ -104,7 +105,7 @@ def clean_state_model_locally(state_model_json):
 
     session_id = request.cookies.get('session_id_nojs', '')
 
-    clean_state_model = {
+    return json.dumps({
         "session_id":  session_id,
         "state_model": {
             "session_id": session_id,
@@ -112,18 +113,16 @@ def clean_state_model_locally(state_model_json):
             "expiry_time_key": state_model_json.get('expiry_time_key', ''),
             "flow": state_model_json.get('flow', ''),
         }
-    }
-
-    return json.dumps(clean_state_model)
+    })
 
 
 def get_full_aws_lambda_function_name(function_name):
     return "arn:aws:lambda:{}:{}:function:{}-{}".format(
-                str(app.config.get("AWS_DEFAULT_REGION")),
-                str(app.config.get("AWS_ACCOUNT_ID")),
-                str(app.config.get("AWS_ENV_NAME")),
-                function_name,
-            )
+        str(app.config.get("AWS_DEFAULT_REGION")),
+        str(app.config.get("AWS_ACCOUNT_ID")),
+        str(app.config.get("AWS_ENV_NAME")),
+        function_name,
+    )
 
 
 def aws_lambda_invoke(func, data):
@@ -154,7 +153,7 @@ def aws_lambda_put_state_model(state_model_json):
 
 def clean_state_model():
     """
-    This function gets full state_model which we retrieved using 
+    This function gets full state_model which we retrieved using
     aws_lambda_get_state_model and prepare 'fresh' state model with only few 
     json arguments  which is then passed back using put-state-model endpoint. 
 
@@ -170,3 +169,57 @@ def clean_state_model():
         app.logger.info("error while cleaning state model")
 
     return True
+
+
+def is_nhs_number_valid(nhs_number):
+    """ Checks if a given nhs number is a valid one
+
+    For more information, see:
+    https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp?shownav=1
+
+    Args:
+        nhs_number (str): The NHS number
+
+    Returns:
+        bool: True if the NHS number is valid, False otherwise
+    """
+    if not nhs_number:
+        app.logger.info("nhs_number_invalid", {'cause': 'no_number_provided'})
+        return False
+
+    nhs_number = str(nhs_number).replace(" ", "")
+
+    if not nhs_number.isdigit():
+        app.logger.info("nhs_number_invalid", {'cause': 'not_numeric'})
+        return False
+
+    if len(nhs_number) != 10:
+        app.logger.info("nhs_number_invalid", {'cause': 'not_10_characters'})
+        return False
+
+    if calculate_nhs_number_check_digit(nhs_number) != int(nhs_number[9]):
+        app.logger.info("nhs_number_invalid", {'cause': 'check_digit_failure'})
+        return False
+
+    app.logger.info("nhs_number_valid")
+    return True
+
+
+def calculate_nhs_number_check_digit(nhs_number):
+    """Calculates the check digit for the NHS number
+
+    For more information, see:
+    https://www.datadictionary.nhs.uk/data_dictionary/attributes/n/nhs/nhs_number_de.asp?shownav=1
+
+    Args:
+        nhs_number (str):  NHS number
+
+    Returns:
+        int: The expected check digit for NHS number
+    """
+    check_digit_sum = sum(int(nhs_number[i]) * (10 - i) for i in range(9))
+    check_digit = 11 - (check_digit_sum % 11)
+    if check_digit == 11:
+        return 0
+    return check_digit
+

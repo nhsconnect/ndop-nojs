@@ -64,7 +64,10 @@ def get_session_id():
 
     except requests.exceptions.RequestException as exc:
         exception_type = type(exc).__name__
-        status_code = exc.response.status_code or "not_applicable"
+        try:
+            status_code = exc.response.status_code or "not_applicable"
+        except AttributeError:
+            status_code = "not_applicable"
         log_safe_exception(exc)
         raise NDOP_RequestError(f'session creation failed, original exception type {exception_type}, response status code {status_code}')
 
@@ -251,7 +254,7 @@ def set_preference(user_details, session_id):
     return False
 
 
-def store_preference(session_id):
+def get_store_preference_result(session_id):
     app.logger.info("storing preference result")
 
     headers = {"Content-type": "application/json"}

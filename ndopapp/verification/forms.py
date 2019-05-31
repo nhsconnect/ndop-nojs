@@ -17,11 +17,19 @@ class VerificationOption(Form):
 
         choices = []
         if user_details.email:
-            choices.append(('Email', 'Send an email to ' + user_details.email))
+            choices.append(('Email', 'By email to ' + user_details.email))
         if user_details.sms:
-            choices.append(('SMS', 'Send an sms to ' + user_details.sms))
-        choices.append(('Unrecognised', 'I do not recognise this email address or phone number'))
+            choices.append(('SMS', 'By text to ' + user_details.sms))
         self.radio.choices = choices
+
+    def validate(self):
+        #validate only if both Email and SMS provided
+        choices_str = str(self.radio.choices)
+        if bool('Email' in choices_str) ^ bool('SMS' in choices_str): #exclusive or
+            self.radio.data = self.radio.choices[0][0] #'SMS' or 'Email'
+            return True
+
+        return Form.validate(self)
 
 
 class CodeForm(Form):
@@ -34,7 +42,7 @@ class CodeForm(Form):
 
         if not self.enterOtpInput.data:
             self.enterOtpInput.errors.append({
-                "message": "Enter your code below",
+                "message": "Enter your security code",
                 "href": "enterOtpInput",
                 "id": "enterOtpInputLink"})
             return False

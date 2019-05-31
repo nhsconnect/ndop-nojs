@@ -75,7 +75,6 @@ class YourDetailsSetYourPreferenceTests(unittest.TestCase):
         self.assertIn('checked', doc.find_all(id='single-opted-in')[0].attrs)
         self.assertNotIn('checked', doc.find_all(id='single-opted-out')[0].attrs)
 
-
     @requests_mock.Mocker(kw='mock')
     @patch('ndopapp.utils.is_session_valid', return_value=True)
     @patch('ndopapp.yourdetails.controllers.ChoiceOption')
@@ -104,10 +103,11 @@ class YourDetailsSetYourPreferenceTests(unittest.TestCase):
                 result = self.client.post('/setyourpreference')
 
                 assert HTTPStatus(result.status_code) == HTTPStatus.FOUND
-                assert routes.get_absolute("yourdetails.submit_preference") in result.headers['Location']
+                assert routes.get_absolute("yourdetails.review_your_choice") in result.headers['Location']
                 with self.client as c:
                     with c.session_transaction() as session:
                         assert not 'timeout_threshold' in session
+
 
     @requests_mock.Mocker(kw='mock')
     @patch('ndopapp.utils.is_session_valid', return_value=True)
@@ -204,7 +204,7 @@ class YourDetailsSetYourPreferenceTests(unittest.TestCase):
         result = self.client.post('/setyourpreference')
 
         assert HTTPStatus(result.status_code) == HTTPStatus.FOUND
-        assert 'genericerror' in result.headers['Location']
+        assert 'setpreferenceerror' in result.headers['Location']
         with self.client as c:
             with c.session_transaction() as session:
                 assert not 'timeout_threshold' in session
@@ -236,7 +236,7 @@ class YourDetailsSetYourPreferenceTests(unittest.TestCase):
         result = self.client.post('/setyourpreference')
 
         assert HTTPStatus(result.status_code) == HTTPStatus.FOUND
-        assert 'genericerror' in result.headers['Location']
+        assert 'setpreferenceerror' in result.headers['Location']
         with self.client as c:
             with c.session_transaction() as session:
                 assert not 'timeout_threshold' in session
@@ -267,13 +267,13 @@ class YourDetailsSetYourPreferenceTests(unittest.TestCase):
         assert not form_mock.radio.data == "Yes" and not form_mock.radio.data == "No"
 
     @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.store_preference')
-    def test_store_preference_result(self, store_preference_mock, _):
+    @patch('ndopapp.yourdetails.controllers.get_store_preference_result')
+    def test_get_store_preference_result(self, get_store_preference_result_mock, _):
         """ Test store_preference_result redirects properly """
 
         test_cases = (
             #(store_ret, is_timeout_in_session, timeout_threshold, expected_status, expected_endpoint)
-            ("success", False, 1, HTTPStatus.FOUND, routes.get_absolute('yourdetails.generic_error')),
+            ("success", False, 1, HTTPStatus.FOUND, routes.get_absolute('main.generic_error')),
             ("success", False, constants.FAR_IN_THE_FUTURE, HTTPStatus.FOUND, routes.get_absolute('yourdetails.thank_you')),
             ("not_completed", True, None, HTTPStatus.OK, None),
             ("failure", False, None, HTTPStatus.FOUND, routes.get_absolute('yourdetails.choice_not_saved')),
@@ -282,66 +282,17 @@ class YourDetailsSetYourPreferenceTests(unittest.TestCase):
             with self.subTest(case=case):
                 store_ret, is_timeout_in_session, timeout_threshold, status, endpoint = case
 
-                store_preference_mock.return_value = store_ret
+                get_store_preference_result_mock.return_value = store_ret
 
                 common.update_session_data(self.client, {'timeout_threshold': timeout_threshold})
 
                 headers = {'Content-type': 'application/json', 'cookie': common.SESSION_ID}
-                result = self.client.post(routes.get_raw("yourdetails.store_preference_result"), headers=headers)
+                result = self.client.get(routes.get_raw("yourdetails.store_preference_result"), headers=headers)
 
                 self.assertEqual(result.status_code, status)
                 if status == HTTPStatus.FOUND:
                     self.assertIn(endpoint, result.headers['Location'])
                 self.assertEqual('timeout_threshold' in common.get_session_data(self.client), is_timeout_in_session)
-
-    @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.set_preference')
-    @patch('ndopapp.yourdetails.controllers.UserDetails')
-    def test_submit_preference_redirects(self, user_details_mock,
-            set_preference_mock, _):
-        """ Test submit_preference redirects properly """
-
-        test_cases = (
-            #(result, expected_endpoint)
-            (False, 'genericerror'),
-            (True, 'reviewyourchoice'),
-        )
-
-        user_details_mock.return_value = None
-
-        for case in test_cases:
-            with self.subTest(case=case):
-                set_preference_mock.return_value, endpoint = case
-
-                headers = {'Content-type': 'application/json', 'cookie': common.SESSION_ID}
-                result = self.client.post('/submitpreference', headers=headers)
-
-                assert result.status_code == HTTPStatus.FOUND
-                assert endpoint in result.headers['Location']
-
-    @patch('ndopapp.utils.is_session_valid', return_value=True)
-    @patch('ndopapp.yourdetails.controllers.confirm_preference')
-    @patch('ndopapp.yourdetails.controllers.UserDetails')
-    def test_confirmation_sender_redirects(self, user_details_mock, set_preference_mock, _):
-        """ Test confirmation_sender redirects properly """
-
-        test_cases = (
-            #(result, expected_endpoint)
-            (False, routes.get_absolute("yourdetails.generic_error")),
-            (True, routes.get_absolute("yourdetails.store_preference_result")),
-        )
-
-        user_details_mock.return_value = None
-
-        for case in test_cases:
-            with self.subTest(case=case):
-                set_preference_mock.return_value, endpoint = case
-
-                headers = {'Content-type': 'application/json', 'cookie': common.SESSION_ID}
-                result = self.client.post(routes.get_raw("yourdetails.confirmation_sender"), headers=headers)
-
-                assert result.status_code == HTTPStatus.FOUND
-                self.assertIn(endpoint, result.headers['Location'])
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ from http import HTTPStatus
 from bs4 import BeautifulSoup
 
 from ndopapp.yourdetails.controllers import yourdetails_blueprint
-from ndopapp.yourdetails.errors import yourdetails_errors_blueprint
+from ndopapp.main.errors import errors_blueprint
 
 SESSION_COOKIE_KEY = "session_id"
 SESSION_ID = "ca9d0f77-7c2b-4e8c-b161-50c79d559a2a"
@@ -59,8 +59,7 @@ def registerExceptionHandlers(app):
     Exception Handlers by default are not connected when in test mode,
     but for tests which require them we can re-register the Exception Handlers
     """
-    app.register_blueprint(yourdetails_errors_blueprint)
-    return
+    app.register_blueprint(errors_blueprint)
 
 
 # DECORATOR HELPER METHODS

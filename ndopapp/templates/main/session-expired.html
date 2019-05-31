@@ -1,20 +1,16 @@
 {% extends "base.html" %}
-{% block title %}You'll have to start again{% endblock %}
 
-{% block content %}
-<h1 class="page-title">Sorry, you'll have to start again</h1>
-{% endblock %}
+{% block title %}Sorry, you'll need to start again{% endblock %}
 
 {% block extra_page_sections %}
 <div class="page-section">
     <div class="reading-width">
         <div class="grid-row">
             <div class="column--two-thirds">
-                <p>Your session automatically ends if you don't use the service for 59 minutes. We
-                    do this for your security.</p>
-                <p>You'll need to <a id="returnButton" href="{{ routes.get_absolute('main.landing_page') }}">start
-                    the service again</a>.
-                </p>
+                <h1 class="h2">Sorry, you'll need to start again</h1>
+                <p>You'll need to start again because you’ve not used this service for a while.</p>
+                <p>We do this for your security.</p>
+                <a id="returnButton" class="button" href="{{ routes.get_absolute('main.landing_page') }}">Start again</a>
             </div>
         </div>
     </div>

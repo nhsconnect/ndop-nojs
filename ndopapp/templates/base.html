@@ -19,18 +19,8 @@
                 <a id="skipToContentLink" href="#content" class="skiplinks__link">Skip to main content</a>
             </div>
         </div>
-        <div class="banner beta">
-            <div class="page-section">
-                <span>BETA</span> This is a new service - your feedback will help this service.
-            </div>
-        </div>
         {% include 'header.html' %}
-        <main id="content" role="main">
-            <div class="page-band">
-                <div class="page-section">
-                  Choose if data from your health records is shared for research and planning
-                </div>
-            </div>
+        <main id="mainContent" role="main">
 
             <div class="page-section">
                 {% block content %}
@@ -41,6 +31,7 @@
             {% endblock %}
 
         </main>
+        {% block feedback_survey_banner %}{% endblock %}
         {% include 'footer.html' %}
     </body>
 </html>

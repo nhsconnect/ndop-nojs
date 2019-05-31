@@ -1,4 +1,5 @@
-import datetime
+import re
+from datetime import datetime, date
 from flask_wtf import FlaskForm as Form
 from wtforms import StringField, IntegerField, RadioField
 from wtforms.validators import Length, NumberRange
@@ -12,32 +13,52 @@ number_length_validator = NumberLengthValidator()
 class NameForm(Form):
     first_name = StringField("First name", validators=[Length(max=255)])
     last_name = StringField("Last name", validators=[Length(max=255)])
+    return_value = True
 
     def validate(self):
         return_value = Form.validate(self)
         if not return_value:
             return False
 
-        if not self.first_name.data or not self.last_name.data:
-            if not self.first_name.data:
+        if not self.first_name.data:
+            self.first_name.errors.append({
+                "id": "firstNameInputLink",
+                "message": "Enter your first name",
+                "href": "firstNameContainer",
+                "error_alert": "Enter your first name"
+            })
+            return_value = False
+        else:
+            result = re.match(r"^[a-zA-Z0-9,-.'\s]+$", self.first_name.data)
+            if not result:
                 self.first_name.errors.append({
                     "id": "firstNameInputLink",
-                    "message": "First name is missing",
+                    "message": "Check your first name",
                     "href": "firstNameContainer",
-                    "error_alert": "Enter your first name"
+                    "error_alert": "Check that you've entered your first name correctly"
                 })
+                return_value = False
 
-            if not self.last_name.data:
+        if not self.last_name.data:
+            self.last_name.errors.append({
+                "id": "lastNameInputLink",
+                "message": "Enter your last name",
+                "href": "lastNameContainer",
+                "error_alert": "Enter your last name"
+            })
+            return_value = False
+        else:
+            result = re.match(r"^[a-zA-Z0-9,-.'\s]+$", self.last_name.data)
+            if not result:
                 self.last_name.errors.append({
                     "id": "lastNameInputLink",
-                    "message": "Last name is missing",
+                    "message": "Check your last name",
                     "href": "lastNameContainer",
-                    "error_alert": "Enter your last name"
+                    "error_alert": "Check that you've entered your last name correctly"
                 })
+                return_value = False
 
-            return False
-
-        return True
+        return return_value
 
 
 class DOBForm(Form):
@@ -48,38 +69,99 @@ class DOBForm(Form):
         "Month", validators=[NumberRange(min=1, max=12)], widget=NumberInput()
     )
     year = IntegerField(
-        "Year", validators=[NumberRange(min=1900, max=3000)], widget=NumberInput()
+        "Year", validators=[NumberRange(1000, 9999)], widget=NumberInput()
     )
 
+    error_message = None
+    valid_fields = {'day': True, 'month': True, 'year': True}
+
+    
+
     def validate(self):
-        return_value = Form.validate(self)
+        # special case where year can take `e` character
+        if(self.year._value() and not self.year.data):
+            self.year.data = 9999
+            self.errors['year'] = 'Error year contains character'
 
-        if not return_value:
-            entries_to_check = ["day", "month", "year"]
+        valid_form = Form.validate(self)
 
-            if any(key in self.errors.keys() for key in entries_to_check):
-                for entry in entries_to_check:
-                    self.errors.pop(entry, None)
+        valid_date = is_valid_date(self.year.data, self.month.data, self.day.data)
+        past_date = is_past_date(self.year.data, self.month.data, self.day.data)
 
-                new_message = {
-                    "dob": [
-                        {'message': "Date of birth is missing or invalid", "href": "dateOfBirthDayContainer", "id": "dateOfBirthInputLink"},
-                        {'message': "Not a valid Date value", "href": "dateOfBirthDayContainer", "id": "dateOfBirthInputLink"},
-                    ]
-                }
-                self.errors.update(new_message)
-            return False
+        if not valid_form or not valid_date or not past_date:
+            self.valid_fields = {'day': not bool(self.errors.get('day')),
+                                'month': not bool(self.errors.get('month')),
+                                'year': not bool(self.errors.get('year'))}
 
-        try:
-            datetime.date(self.year.data, self.month.data, self.day.data)
-        except ValueError:
+            
+            flashing_message, error_message = self.build_error_messages(self.valid_fields)
+
+            self.error_message = error_message
             new_message = {
-                "dob": ["Date of birth is missing or invalid", "Not a valid Date value"]
+                "dob": [
+                    {'message': flashing_message, "href": "dateOfBirthDayContainer",
+                        "id": "dateOfBirthInputLink", "error_alert": flashing_message}
+                ]
             }
             self.errors.update(new_message)
+
             return False
 
+        self.valid_fields = {'day': True, 'month': True, 'year': True}
+
         return True
+
+
+    def build_error_messages(self, valid_fields):
+
+        if(not self.day.data and not self.month.data and not self.year.data):
+            return 'Enter your date of birth', 'Enter your date of birth'
+        if(not self.day.data and not self.month.data and self.year.data):
+            return 'Date of birth must include a day and a month', 'Date of birth must include a day and a month'
+        if(not self.day.data and self.month.data and not self.year.data):
+            return 'Date of birth must include a day and a year', 'Date of birth must include a day and a year'
+        if(self.day.data and not self.month.data and not self.year.data):
+            return 'Date of birth must include a month and a year', 'Date of birth must include a month and a year'
+        if(not self.day.data and self.month.data and self.year.data):
+            return 'Date of birth must include a day', 'Date of birth must include a day'
+        if(self.day.data and not self.month.data and self.year.data):
+            return 'Date of birth must include a month', 'Date of birth must include a month'
+        if(self.day.data and self.month.data and not self.year.data):
+            return 'Date of birth must include a year', 'Date of birth must include a year'
+        if(all(v for _,v in valid_fields.items())):
+            valid_date = is_valid_date(self.year.data, self.month.data, self.day.data)
+            past_date = is_past_date(self.year.data, self.month.data, self.day.data)
+            if(not valid_date):
+                self.valid_fields = {'day': False, 'month': False, 'year': False}
+                return 'Check your date of birth', "Check that you've entered your date of birth correctly"
+            if(not past_date):
+                self.valid_fields = {'day': False, 'month': False, 'year': False}
+                return 'Date of birth must be in the past', "Date of birth must be in the past"
+        if(not valid_fields.get('day') and valid_fields.get('month') and valid_fields.get('year')):
+            return 'Check your date of birth', "Check that you've entered the day you were born correctly"
+        if(valid_fields.get('day') and not valid_fields.get('month') and valid_fields.get('year')):
+            return 'Check your date of birth', "Check that you've entered the month you were born correctly"
+        if(valid_fields.get('day') and valid_fields.get('month') and not valid_fields.get('year')):
+            return 'Check your date of birth', "Check that you've entered the year you were born correctly"
+
+        return 'Check your date of birth', "Check that you've entered your date of birth correctly"
+
+
+def is_valid_date(year, month, day):
+    if (not year or not month or not day):
+        return False
+    try:
+        date(year, month, day)
+    except ValueError:
+        return False
+    else:
+        return True
+
+
+def is_past_date(year, month, day):
+    if not is_valid_date(year, month, day):
+        return False
+    return date(year, month, day) < date.today()
 
 
 class AuthOption(Form):
@@ -91,7 +173,8 @@ class AuthOption(Form):
         if not return_value:
             self.errors.update({
                 "nhs_number": [
-                    {"message": "Select an option", "href": "radioFormLegend", "id": "authOptionErrorLink"}
+                    {"message": "Select yes if you know your NHS number",
+                     "href": "radioFormLegend", "id": "authOptionErrorLink"}
                 ]
             })
             return False
@@ -109,12 +192,33 @@ class NHSNumberForm(Form):
             pass
 
         if not self.nhs_number.data:
-            self.nhs_number.errors.append({"message": "NHS number is missing or invalid", "href": "nhsNumberContainer", "id": "nhsNumberInputLink", "error_alert": "Please enter your NHS Number" })
+            self.nhs_number.errors.append({"message": "Enter your NHS number",
+                                           "href": "nhsNumberContainer", "id": "nhsNumberInputLink",
+                                           "error_alert": "Enter your NHS number" })
             return False
 
-        if number_length_validator.normalise_number(self.nhs_number.data, self.NHS_NUMBER_LENGTH) is None:
-            self.nhs_number.errors.append({"message": "NHS number is missing or invalid", "href": "nhsNumberContainer", "id": "nhsNumberInputLink", "error_alert": "Please enter your NHS Number"})
+        if number_length_validator.ni_number_check(self.nhs_number.data):
+            self.nhs_number.errors.append({"message": "We think you've entered a National Insurance number. You need to enter your NHS number",
+                                           "href": "nhsNumberContainer", "id": "nhsNumberInputLink",
+                                           "error_alert": "We think you've entered a National Insurance number. You need to enter your NHS number"})
+            return False
 
+        if number_length_validator.number_only(self.nhs_number.data):
+            self.nhs_number.errors.append({"message": "Your NHS number should not contain letters",
+                                           "href": "nhsNumberContainer", "id": "nhsNumberInputLink",
+                                           "error_alert": "Your NHS number should not contain letters"})
+            return False
+
+        if len(self.nhs_number.data.replace(' ', '')) < self.NHS_NUMBER_LENGTH:
+            self.nhs_number.errors.append({"message": "Your NHS number is too short",
+                                           "href": "nhsNumberContainer", "id": "nhsNumberInputLink",
+                                           "error_alert": "Your NHS number is too short"})
+            return False
+
+        if len(self.nhs_number.data.replace(' ', '')) > self.NHS_NUMBER_LENGTH:
+            self.nhs_number.errors.append({"message": "Your NHS number is too long",
+                                           "href": "nhsNumberContainer", "id": "nhsNumberInputLink",
+                                           "error_alert": "Your NHS number is too long"})
             return False
 
         return True
@@ -129,11 +233,15 @@ class PostcodeForm(Form):
             pass
 
         if not self.postcode.data:
-            self.postcode.errors.append({"message": "Postcode is missing or invalid", "id": "postcodeInputLink", "href": "postcodeContainer", "error_alert": "Please enter your postcode"})
+            self.postcode.errors.append({"message": "Enter your postcode", "id": "postcodeInputLink",
+                                         "href": "postcodeContainer",
+                                         "error_alert": "Enter your postcode"})
             return False
 
         if postcode_validator.normalise_postcode(self.postcode.data) is None:
-            self.postcode.errors.append({"message": "Postcode is missing or invalid", "id": "postcodeInputLink", "href": "postcodeContainer", "error_alert": "Please enter your postcode"})
+            self.postcode.errors.append({"message": "Check your postcode",
+                                         "id": "postcodeInputLink", "href": "postcodeContainer",
+                                         "error_alert": "Check that you've entered your postcode correctly"})
             return False
 
         return True
@@ -152,7 +260,8 @@ class ChoiceOption(Form):
         if not return_value:
             self.errors.update({
                 "preference": [
-                    {"message": "No choice selected", "href": "preference", "id": "setPreferencesInputLink" }
+                    {"message": "Select your choice", "href": "preference",
+                     "id": "setPreferencesInputLink" }
                 ]
             })
             return False

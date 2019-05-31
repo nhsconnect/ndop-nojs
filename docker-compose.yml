@@ -6,6 +6,8 @@ services:
       context: .
       dockerfile: ci/ndopapp/Dockerfile
     environment:
+      - AWS_ENV_NAME=local
+      - LOCAL_DEVELOPMENT=True
       - FLASK_APP=main.py
       - FLASK_ENV=production
       - SERVER_NAME=localhost.dev

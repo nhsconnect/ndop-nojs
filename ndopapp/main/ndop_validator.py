@@ -25,3 +25,20 @@ class NumberLengthValidator:
         if len(number) == number_length:
             return number
         return None
+
+    @staticmethod
+    def number_only(number):
+        """ Return a normalised NHS number if valid, or None if not, """
+        number = number.replace(' ', '')
+        result = re.match(r"^[0-9]+$", number)
+        if not result:
+            return True
+        return False
+
+    @staticmethod
+    def ni_number_check(number):
+        """ Return a normalised NHS number if valid, or None if not, """
+        ni_nuber = re.match(r"^\s*[a-zA-Z]{2}(?:\s*\d\s*){6}[a-zA-Z]?\s*$", number)
+        if ni_nuber:
+            return True
+        return False

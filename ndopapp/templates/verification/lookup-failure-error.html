@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Sorry, your details do not match what we have in our records{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2">Sorry, your details do not match what we have in our records</h1>
+            <p>If the details you gave are correct you'll need to update your details at your GP practice
+                before you can make your choice online.</p>
+            <p>If you think you made a mistake entering your details you can try again.</p>
+            <a class="button" href="{{ routes.get_absolute('yourdetails.your_details') }}">
+                Try again
+            </a>
+            {% include 'snippet/other-ways-to-manage-your-choice.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

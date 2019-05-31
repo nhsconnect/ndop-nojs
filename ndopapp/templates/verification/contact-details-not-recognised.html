@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Sorry, we have the wrong contact details for you{% endblock %}
+
+{% block content %}
+<div class="reading-width">
+    <div class="grid-row">
+        <div class="column--two-thirds">
+            <h1 class="h2">Sorry, we have the wrong contact details for you</h1>
+            <p>You'll need to update your details at your GP practice. Once your details are updated, you'll be able to make your choice online.</p>
+            {% include 'snippet/other-ways-to-manage-your-choice.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

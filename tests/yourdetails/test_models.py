@@ -104,8 +104,8 @@ class YourDetailsModelsTests(unittest.TestCase):
 
     @requests_mock.Mocker(kw='r_mock')
     @patch('ndopapp.yourdetails.models.app')
-    def test_store_preference_returns_proper_result(self, app_mock, **kwargs):
-        """Verify that store_preference returns expected result per status_code"""
+    def test_get_store_preference_result_returns_proper_result(self, app_mock, **kwargs):
+        """Verify that get_store_preference_result returns expected result per status_code"""
 
         test_cases = [
             # (status_code, expected_result)
@@ -124,7 +124,7 @@ class YourDetailsModelsTests(unittest.TestCase):
                 the_requests_mock = kwargs['r_mock']
                 the_requests_mock.get(requests_mock.ANY, status_code=status_code)
 
-                self.assertEqual(models.store_preference('some session id'), expected_result)
+                self.assertEqual(models.get_store_preference_result('some session id'), expected_result)
 
     @requests_mock.Mocker(kw='r_mock')
     @patch('ndopapp.yourdetails.models.app')

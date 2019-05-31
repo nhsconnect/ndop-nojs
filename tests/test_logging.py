@@ -169,8 +169,8 @@ class RecordFactoryTest(unittest.TestCase):
             del os.environ[key]
 
     def test_environment_added_to_record(self):
-        """The ENV_NAME environment variable is added to log records as the environment attribute"""
-        with self.env_var('ENV_NAME', 'Hello World'):
+        """The AWS_ENV_NAME environment variable is added to log records as the environment attribute"""
+        with self.env_var('AWS_ENV_NAME', 'Hello World'):
             record = logging.makeLogRecord({})
             self.assertEqual('Hello World', record.environment)
 
